@@ -1,0 +1,35 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>M-Pesa Checkout</title>
+    <script src="https://tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 font-sans min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white max-w-md w-full border border-slate-200 rounded-2xl shadow-xl overflow-hidden">
+        <div class="bg-emerald-600 p-6 text-white text-center">
+            <h2 class="text-xl font-black tracking-wide uppercase">Safaricom M-Pesa</h2>
+            <p class="text-emerald-100 text-xs mt-1">Secure STK Push Checkout</p>
+        </div>
+        <div class="p-6">
+            <p class="text-xs font-semibold uppercase text-slate-400 tracking-wider">Purchasing Item</p>
+            <h3 class="text-lg font-bold text-slate-900 mt-0.5">{{ phone.name }}</h3>
+            <div class="my-4 p-4 bg-slate-50 border border-slate-100 rounded-xl flex justify-between items-center">
+                <span class="text-sm text-slate-500 font-medium">Total Amount Due</span>
+                <span class="text-2xl font-black text-rose-600">KSh {{ "{:,}".format(phone.price) }}</span>
+            </div>
+            <form method="POST" class="mt-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700">M-Pesa Phone Number</label>
+                    <input type="text" name="phone_number" placeholder="e.g. 0712345678" required class="mt-1.5 block w-full px-3 py-2.5 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 font-medium">
+                    <p class="text-[11px] text-slate-400 mt-1">Enter your active Safaricom SIM line configuration format.</p>
+                </div>
+                <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm rounded-xl shadow-md transition duration-200">
+                    Simulate M-Pesa Payment
+                </button>
+            </form>
+            <div class="text-center mt-6"><a href="/" class="text-sm font-medium text-slate-400 hover:text-slate-600 transition">Cancel and Return</a></div>
+        </div>
+    </div>
+</body>
+</html>

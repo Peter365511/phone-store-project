@@ -1,0 +1,44 @@
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Your Purchases</title>
+    <script src="https://tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 font-sans min-h-screen flex flex-col">
+    <nav class="bg-slate-900 border-b border-slate-800 shadow-md">
+        <div class="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
+            <a href="/" class="text-white font-extrabold text-lg"><span class="text-emerald-500">🇰🇪</span> PhoneStore</a>
+            <a href="/" class="text-sm font-semibold text-slate-300 hover:text-white transition">← Return to Shop</a>
+        </div>
+    </nav>
+    <main class="max-w-4xl mx-auto w-full px-4 py-12 flex-grow">
+        <h2 class="text-2xl font-black text-slate-900 mb-2">Paid Products History</h2>
+        <p class="text-sm text-slate-500 font-medium">Verified historical list of successful transactions fetched directly from your permanent SQLite tables.</p>
+        <div class="mt-8 space-y-4">
+            {% if orders %}
+                {% for order in orders %}
+                    <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Product Model</span>
+                            <h3 class="text-base font-bold text-slate-900 mt-0.5">{{ order.item_name }}</h3>
+                            <p class="text-xs text-slate-400 font-medium mt-1">Payer Phone Line: {{ order.phone_number }}</p>
+                        </div>
+                        <div class="flex sm:flex-col sm:items-end justify-between items-center border-t sm:border-t-0 pt-4 sm:pt-0 border-slate-100">
+                            <span class="text-lg font-black text-slate-900">KSh {{ "{:,}".format(order.amount) }}</span>
+                            <span class="mt-1 px-2.5 py-1 text-[11px] font-bold rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 shadow-sm inline-block">
+                                {{ order.status }}
+                            </span>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="bg-white border border-slate-200/80 rounded-2xl p-12 text-center shadow-sm">
+                    <p class="text-slate-400 font-medium text-sm">No recorded transactions found on your user account logs.</p>
+                    <a href="/" class="mt-4 inline-block bg-slate-950 hover:bg-slate-800 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-sm transition">Shop Inventory Now</a>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+</body>
+</html>

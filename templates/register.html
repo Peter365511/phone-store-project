@@ -1,0 +1,42 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account | PhoneStore</title>
+    <script src="https://tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 font-sans min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+
+    <div class="sm:mx-auto sm:w-full sm:max-w-md text-center">
+        <a href="/" class="text-2xl font-black tracking-tight text-slate-900">
+            <span class="text-emerald-500">🇰🇪</span> PhoneStore
+        </a>
+        <h2 class="mt-6 text-3xl font-black tracking-tight text-slate-900">Create a new account</h2>
+    </div>
+
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4">
+        <div class="bg-white py-8 px-4 border border-slate-200/80 rounded-2xl shadow-xl sm:px-10">
+            <form class="space-y-6" method="POST">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700">Choose Username</label>
+                    <input type="text" name="username" placeholder="e.g. otieno_dev" required class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700">Choose Password</label>
+                    <input type="password" name="password" placeholder="••••••••" required class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 sm:text-sm">
+                </div>
+                <button type="submit" class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transition duration-200">
+                    Sign Up Permanent Account
+                </button>
+            </form>
+            
+            <div class="mt-6 pt-6 border-t border-slate-100 text-center">
+                <a href="/login" class="font-bold text-slate-700 hover:text-indigo-600 text-sm transition">Already have an account? Login here</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
