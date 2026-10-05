@@ -1,3 +1,4 @@
+
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import sqlite3
 import os
@@ -48,9 +49,32 @@ def init_db():
     cursor.execute("SELECT COUNT(*) FROM phones")
     if cursor.fetchone()[0] == 0:
         default_phones = [
-            ("Samsung Galaxy S24 Ultra", 145000, "256GB Storage, 12GB RAM, 200MP Camera. Ultimate performance.", "https://unsplash.com"),
-            ("iPhone 15 Pro Max", 165000, "Titanium design, A17 Pro chip, 256GB. Premium smartphones.", "https://unsplash.com"),
-            ("Xiaomi Redmi Note 13 Pro", 38500, "8GB RAM, 256GB Storage, 5000mAh battery. Incredible value.", "https://unsplash.com")
+            # --- SAMSUNG S-ULTRA SERIES (Premium Flagship) ---
+            ("Samsung Galaxy S25 Ultra", 165000, "12GB RAM, 512GB Storage. Snapdragon 8 Gen 4, Pro-grade 200MP Camera Ecosystem.", "https://unsplash.com"),
+            ("Samsung Galaxy S24 Ultra", 135000, "12GB RAM, 256GB Storage. Solid Titanium Frame with Galaxy AI Machine Tools.", "https://unsplash.com"),
+            ("Samsung Galaxy S23 Ultra", 110000, "8GB RAM, 256GB Storage. High zoom 100x Space Engine & Built-in S-Pen Slot.", "https://unsplash.com"),
+            
+            # --- SAMSUNG A SERIES (Balanced Mid-Tier) ---
+            ("Samsung Galaxy A55 5G", 54000, "8GB RAM, 128GB Storage. Premium Protective Metal Frame with Gorilla Glass Finish.", "https://unsplash.com"),
+            ("Samsung Galaxy A35 5G", 42000, "6GB RAM, 128GB Storage. Fluid Super AMOLED Screen & 50MP Stable Main Sensor.", "https://unsplash.com"),
+            ("Samsung Galaxy A15", 23000, "4GB RAM, 128GB Storage. Smooth 90Hz Display backed by a 5000mAh Battery.", "https://unsplash.com"),
+
+            # --- TECNO PERFORMANCE LAYERS (High Market Demand) ---
+            ("Tecno Camon 30 Pro 5G", 48000, "12GB RAM, 512GB Storage. Flagship Sony IMX890 Camera Unit with Dimensity Processing.", "https://unsplash.com"),
+            ("Tecno Camon 20 Premier", 39500, "8GB RAM, 512GB Storage. Artistic Geometric Leather Layer with Wide Angle Lens.", "https://unsplash.com"),
+            ("Tecno Spark 20 Pro+", 29000, "8GB RAM, 256GB Storage. Ergonomic Curved AMOLED Screen housing 108MP Sensor.", "https://unsplash.com"),
+            ("Tecno Spark 20 Go", 14500, "4GB RAM, 64GB Storage. Dynamic Notification UI Elements with Dual Speakers.", "https://unsplash.com"),
+
+            # --- ITEL SERIES (Budget & High-Value Tier) ---
+            ("itel S25 Pro", 18500, "8GB RAM, 256GB Storage. Ultra-slim Body Profiles combined with crisp AMOLED Glass.", "https://unsplash.com"),
+            ("itel S23 Plus", 21000, "8GB RAM, 256GB Storage. Immersive 3D Curved Panels and 50MP Portrait Hardware.", "https://unsplash.com"),
+            ("itel P55 5G", 16000, "6GB RAM, 128GB Storage. Extremely Cost-Effective 5G Connectivity Module.", "https://unsplash.com"),
+            ("itel A70", 12800, "4GB RAM, 128GB Storage. Modern Structural Form designed for reliable daily operations.", "https://unsplash.com"),
+            ("itel A05s", 9500, "2GB RAM, 32GB Storage. Affordable Entry Tier device ideal for basic application browsing.", "https://unsplash.com"),
+            
+            # --- PREFERRED HISTORICAL ENTRIES ---
+            ("iPhone 15 Pro Max", 165000, "256GB Storage. Elegant Titanium structure housing ultra high-speed A17 processing blocks.", "https://unsplash.com"),
+            ("Xiaomi Redmi Note 13 Pro", 38500, "8GB RAM, 256GB Storage. Fast Charging Modules paired with 5000mAh cells.", "https://unsplash.com")
         ]
         cursor.executemany("INSERT INTO phones (name, price, description, image) VALUES (?, ?, ?, ?)", default_phones)
     conn.commit()
@@ -166,49 +190,3 @@ def orders():
         flash("Please log in to view your orders!", "danger")
         return redirect(url_for('login'))
     conn = get_db_connection()
-    user_orders = conn.execute('SELECT * FROM orders WHERE username = ? ORDER BY id DESC', (session['user'],)).fetchall()
-    conn.close()
-    return render_template('orders.html', orders=user_orders)
-
-# ================= NEW ADMIN MANAGEMENT CONTROL PATHS =================
-
-@app.route('/admin', methods=['GET', 'POST'])
-def admin_panel():
-    # Security checkpoint: Restrict page to user session 'admin'
-    if session.get('user') != 'admin':
-        flash("Unauthorized Access! Admin session verification failed.", "danger")
-        return redirect(url_for('login'))
-        
-    conn = get_db_connection()
-    
-    if request.method == 'POST':
-        # Check if user is adding a phone
-        if 'add_phone' in request.form:
-            name = request.form.get('name')
-            price = int(request.form.get('price'))
-            description = request.form.get('description')
-            image = request.form.get('image')
-            
-            conn.execute('INSERT INTO phones (name, price, description, image) VALUES (?, ?, ?, ?)', 
-                         (name, price, description, image))
-            conn.commit()
-            flash(f"Successfully added {name} to store inventory!", "success")
-            
-        # Check if user is deleting a phone
-        elif 'delete_id' in request.form:
-            delete_id = request.form.get('delete_id')
-            conn.execute('DELETE FROM phones WHERE id = ?', (delete_id,))
-            conn.commit()
-            flash("Product listing removed completely.", "info")
-            
-        return redirect(url_for('admin_panel'))
-        
-    all_phones = conn.execute('SELECT * FROM phones ORDER BY id DESC').fetchall()
-    all_orders = conn.execute('SELECT * FROM orders ORDER BY id DESC').fetchall()
-    conn.close()
-    
-    return render_template('admin.html', products=all_phones, orders=all_orders)
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
