@@ -6,29 +6,43 @@
     <title>Kenya Phone Hub Store</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 0; color: #333; }
-        .header { background: #2c3e50; color: white; padding: 30px 20px; text-align: center; position: relative; }
-        .nav-links { position: absolute; top: 20px; right: 20px; }
-        .nav-links a { color: white; text-decoration: none; margin-left: 15px; font-weight: bold; background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 4px; }
-        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
-        .phone-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
-        .phone-card { background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s; }
-        .phone-card:hover { transform: translateY(-5px); }
+        .header { background: #1a252f; color: white; padding: 35px 20px; text-align: center; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .nav-links { position: absolute; top: 25px; right: 20px; }
+        .nav-links a { color: white; text-decoration: none; margin-left: 15px; font-weight: bold; background: rgba(255,255,255,0.15); padding: 7px 16px; border-radius: 6px; transition: background 0.2s; }
+        .nav-links a:hover { background: rgba(255,255,255,0.3); }
+        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        .phone-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
+        .phone-card { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); overflow: hidden; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.25s, box-shadow 0.25s; border: 1px solid #eef2f5; }
+        .phone-card:hover { transform: translateY(-8px); box-shadow: 0 12px 24px rgba(0,0,0,0.08); }
         
-        /* CSS Phone Mockup Graphic - Replaces failing image URLs */
-        .phone-mockup { width: 100%; height: 200px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-direction: column; color: white; font-weight: bold; text-align: center; box-shadow: inset 0 0 40px rgba(0,0,0,0.2); }
-        .brand-samsung { background: linear-gradient(135deg, #0d47a1, #1976d2); }
-        .brand-tecno { background: linear-gradient(135deg, #6a1b9a, #8e24aa); }
-        .brand-itel { background: linear-gradient(135deg, #c62828, #e53935); }
-        .brand-default { background: linear-gradient(135deg, #37474f, #4f5b66); }
-        .screen-notch { width: 40px; height: 10px; background: rgba(0,0,0,0.3); border-radius: 0 0 6px 6px; position: relative; top: -45px; }
+        /* High-Level CSS Smartphone Hardware Mockups */
+        .phone-container { width: 100%; height: 210px; border-radius: 12px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; box-shadow: inset 0 0 50px rgba(0,0,0,0.15); }
         
-        .brand-badge { display: inline-block; font-size: 0.75rem; background: #e3f2fd; color: #0d47a1; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; font-weight: bold; margin-top: 15px; }
-        .phone-title { margin: 10px 0 5px 0; color: #2c3e50; font-size: 1.2rem; }
-        .phone-desc { color: #7f8c8d; font-size: 0.9rem; margin-bottom: 15px; min-height: 45px; line-height: 1.4; }
-        .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
-        .price-tag { font-size: 1.25rem; font-weight: bold; color: #27ae60; }
-        .buy-btn { background: #2980b9; color: white; padding: 10px 18px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 0.9rem; }
-        .flash-msg { background: #2ecc71; color: white; padding: 10px; border-radius: 6px; text-align: center; margin-bottom: 20px; }
+        /* Brand Specific Vector Gradients */
+        .samsung-ultra-bg { background: linear-gradient(145deg, #2c3e50, #0f171e); } /* Premium Matte Titanium */
+        .samsung-a-bg { background: linear-gradient(145deg, #1e3c72, #2a5298); } /* Deep Royal Blue */
+        .tecno-bg { background: linear-gradient(145deg, #4a00e0, #8e2de2); } /* Vibrant Purple & Indigo */
+        .itel-bg { background: linear-gradient(145deg, #d31027, #ea00d9); } /* Crimson & Fuchsia Flare */
+        .premium-bg { background: linear-gradient(145deg, #111111, #434343); } /* Sleek Onyx Obsidian */
+        
+        /* Realistic Phone Hardware Accents */
+        .phone-inner-screen { width: 88%; height: 92%; border-radius: 8px; border: 2px solid rgba(255,255,255,0.15); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; background: rgba(255,255,255,0.03); backdrop-filter: blur(2px); }
+        .camera-lens { width: 22px; height: 22px; background: rgba(255,255,255,0.1); border-radius: 50%; position: absolute; top: 22px; border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 0 8px rgba(255,255,255,0.2); }
+        .camera-lens::after { content: ''; width: 8px; height: 8px; background: rgba(255,255,255,0.3); border-radius: 50%; display: block; margin: 3px auto; }
+        
+        .brand-badge { display: inline-block; font-size: 0.75rem; padding: 5px 12px; border-radius: 30px; text-transform: uppercase; font-weight: bold; margin-top: 15px; letter-spacing: 0.5px; }
+        .badge-samsung { background: #e3f2fd; color: #0d47a1; }
+        .badge-tecno { background: #f3e5f5; color: #4a148c; }
+        .badge-itel { background: #ffebee; color: #b71c1c; }
+        .badge-premium { background: #eceff1; color: #263238; }
+        
+        .phone-title { margin: 12px 0 6px 0; color: #2c3e50; font-size: 1.25rem; font-weight: 700; }
+        .phone-desc { color: #7f8c8d; font-size: 0.9rem; margin-bottom: 18px; min-height: 45px; line-height: 1.4; }
+        .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 10px; border-top: 1px solid #f8fafc; }
+        .price-tag { font-size: 1.3rem; font-weight: bold; color: #27ae60; }
+        .buy-btn { background: #2980b9; color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 0.9rem; box-shadow: 0 4px 6px rgba(41,128,185,0.2); transition: background 0.2s; }
+        .buy-btn:hover { background: #2171a3; }
+        .flash-msg { background: #2ecc71; color: white; padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 25px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
@@ -59,19 +73,36 @@
         <div class="phone-grid">
             {% for product in products %}
             <div class="phone-card">
-                <!-- Smart CSS Phone Shell Graphic Generation -->
-                <div class="phone-mockup {% if 'Samsung' in product.name %}brand-samsung{% elif 'Tecno' in product.name %}brand-tecno{% elif 'itel' in product.name %}brand-itel{% else %}brand-default{% endif %}">
-                    <div class="screen-notch"></div>
-                    <span style="font-size: 1.4rem; letter-spacing: 1px;">📱 DIGITAL</span>
-                    <span style="font-size: 0.75rem; opacity: 0.8; margin-top: 5px;">STORE DEVICE</span>
+                <!-- Advanced Dynamic Vector Render Block -->
+                <div class="phone-container 
+                    {% if 'Ultra' in product.name %}samsung-ultra-bg
+                    {% elif 'Samsung' in product.name %}samsung-a-bg
+                    {% elif 'Tecno' in product.name %}tecno-bg
+                    {% elif 'itel' in product.name %}itel-bg
+                    {% else %}premium-bg{% endif %}">
+                    
+                    <div class="camera-lens"></div>
+                    <div class="phone-inner-screen">
+                        <span style="font-size: 1.1rem; letter-spacing: 2px; font-weight: 800; opacity: 0.95;">
+                            {% if 'Samsung' in product.name %}SAMSUNG
+                            {% elif 'Tecno' in product.name %}TECNO
+                            {% elif 'itel' in product.name %}ITEL
+                            {% else %}PREMIUM{% endif %}
+                        </span>
+                        <span style="font-size: 0.7rem; opacity: 0.7; margin-top: 4px; font-weight: 600; text-transform: uppercase;">READY TO SHIP</span>
+                    </div>
                 </div>
                 
                 <div>
-                    <span class="brand-badge">
-                        {% if 'Samsung' in product.name %}Samsung
-                        {% elif 'Tecno' in product.name %}Tecno
-                        {% elif 'itel' in product.name %}itel
-                        {% else %}Premium{% endif %}
+                    <span class="brand-badge 
+                        {% if 'Samsung' in product.name %}badge-samsung
+                        {% elif 'Tecno' in product.name %}badge-tecno
+                        {% elif 'itel' in product.name %}badge-itel
+                        {% else %}badge-premium{% endif %}">
+                        {% if 'Samsung' in product.name %}Samsung Hardware
+                        {% elif 'Tecno' in product.name %}Tecno Mobile
+                        {% elif 'itel' in product.name %}itel Value
+                        {% else %}Premium Flagship{% endif %}
                     </span>
                     <h3 class="phone-title">{{ product.name }}</h3>
                     <p class="phone-desc">{{ product.description }}</p>
