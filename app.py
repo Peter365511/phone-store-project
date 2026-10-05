@@ -15,6 +15,10 @@ def get_db_connection():
 def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
+    
+    # CRITICAL: Force-clear existing tables to clear cached 3-phone inventories on Render
+    cursor.execute('DROP TABLE IF EXISTS phones')
+    
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -42,41 +46,41 @@ def init_db():
             image TEXT NOT NULL
         )
     ''')
+    
     cursor.execute("SELECT * FROM users WHERE username = 'admin'")
     if not cursor.fetchone():
         cursor.execute("INSERT INTO users (username, password) VALUES ('admin', '1234')")
         
-    cursor.execute("SELECT COUNT(*) FROM phones")
-    if cursor.fetchone()[0] == 0:
-        default_phones = [
-            # --- SAMSUNG S-ULTRA SERIES (Premium Flagship) ---
-            ("Samsung Galaxy S25 Ultra", 165000, "12GB RAM, 512GB Storage. Snapdragon 8 Gen 4, Pro-grade 200MP Camera Ecosystem.", "https://unsplash.com"),
-            ("Samsung Galaxy S24 Ultra", 135000, "12GB RAM, 256GB Storage. Solid Titanium Frame with Galaxy AI Machine Tools.", "https://unsplash.com"),
-            ("Samsung Galaxy S23 Ultra", 110000, "8GB RAM, 256GB Storage. High zoom 100x Space Engine & Built-in S-Pen Slot.", "https://unsplash.com"),
-            
-            # --- SAMSUNG A SERIES (Balanced Mid-Tier) ---
-            ("Samsung Galaxy A55 5G", 54000, "8GB RAM, 128GB Storage. Premium Protective Metal Frame with Gorilla Glass Finish.", "https://unsplash.com"),
-            ("Samsung Galaxy A35 5G", 42000, "6GB RAM, 128GB Storage. Fluid Super AMOLED Screen & 50MP Stable Main Sensor.", "https://unsplash.com"),
-            ("Samsung Galaxy A15", 23000, "4GB RAM, 128GB Storage. Smooth 90Hz Display backed by a 5000mAh Battery.", "https://unsplash.com"),
+    # Seed data with working public smartphone images instead of generic homepage text links
+    default_phones = [
+        # --- SAMSUNG S-ULTRA SERIES (Premium Flagship) ---
+        ("Samsung Galaxy S25 Ultra", 165000, "12GB RAM, 512GB Storage. Snapdragon 8 Gen 4, Pro-grade 200MP Camera Ecosystem.", "https://unsplash.com"),
+        ("Samsung Galaxy S24 Ultra", 135000, "12GB RAM, 256GB Storage. Solid Titanium Frame with Galaxy AI Machine Tools.", "https://unsplash.com"),
+        ("Samsung Galaxy S23 Ultra", 110000, "8GB RAM, 256GB Storage. High zoom 100x Space Engine & Built-in S-Pen Slot.", "https://unsplash.com"),
+        
+        # --- SAMSUNG A SERIES (Balanced Mid-Tier) ---
+        ("Samsung Galaxy A55 5G", 54000, "8GB RAM, 128GB Storage. Premium Protective Metal Frame with Gorilla Glass Finish.", "https://unsplash.com"),
+        ("Samsung Galaxy A35 5G", 42000, "6GB RAM, 128GB Storage. Fluid Super AMOLED Screen & 50MP Stable Main Sensor.", "https://unsplash.com"),
+        ("Samsung Galaxy A15", 23000, "4GB RAM, 128GB Storage. Smooth 90Hz Display backed by a 5000mAh Battery.", "https://unsplash.com"),
 
-            # --- TECNO PERFORMANCE LAYERS (High Market Demand) ---
-            ("Tecno Camon 30 Pro 5G", 48000, "12GB RAM, 512GB Storage. Flagship Sony IMX890 Camera Unit with Dimensity Processing.", "https://unsplash.com"),
-            ("Tecno Camon 20 Premier", 39500, "8GB RAM, 512GB Storage. Artistic Geometric Leather Layer with Wide Angle Lens.", "https://unsplash.com"),
-            ("Tecno Spark 20 Pro+", 29000, "8GB RAM, 256GB Storage. Ergonomic Curved AMOLED Screen housing 108MP Sensor.", "https://unsplash.com"),
-            ("Tecno Spark 20 Go", 14500, "4GB RAM, 64GB Storage. Dynamic Notification UI Elements with Dual Speakers.", "https://unsplash.com"),
+        # --- TECNO PERFORMANCE LAYERS (High Market Demand) ---
+        ("Tecno Camon 30 Pro 5G", 48000, "12GB RAM, 512GB Storage. Flagship Sony IMX890 Camera Unit with Dimensity Processing.", "https://unsplash.com"),
+        ("Tecno Camon 20 Premier", 39500, "8GB RAM, 512GB Storage. Artistic Geometric Leather Layer with Wide Angle Lens.", "https://unsplash.com"),
+        ("Tecno Spark 20 Pro+", 29000, "8GB RAM, 256GB Storage. Ergonomic Curved AMOLED Screen housing 108MP Sensor.", "https://unsplash.com"),
+        ("Tecno Spark 20 Go", 14500, "4GB RAM, 64GB Storage. Dynamic Notification UI Elements with Dual Speakers.", "https://unsplash.com"),
 
-            # --- ITEL SERIES (Budget & High-Value Tier) ---
-            ("itel S25 Pro", 18500, "8GB RAM, 256GB Storage. Ultra-slim Body Profiles combined with crisp AMOLED Glass.", "https://unsplash.com"),
-            ("itel S23 Plus", 21000, "8GB RAM, 256GB Storage. Immersive 3D Curved Panels and 50MP Portrait Hardware.", "https://unsplash.com"),
-            ("itel P55 5G", 16000, "6GB RAM, 128GB Storage. Extremely Cost-Effective 5G Connectivity Module.", "https://unsplash.com"),
-            ("itel A70", 12800, "4GB RAM, 128GB Storage. Modern Structural Form designed for reliable daily operations.", "https://unsplash.com"),
-            ("itel A05s", 9500, "2GB RAM, 32GB Storage. Affordable Entry Tier device ideal for basic application browsing.", "https://unsplash.com"),
-            
-            # --- PREFERRED HISTORICAL ENTRIES ---
-            ("iPhone 15 Pro Max", 165000, "256GB Storage. Elegant Titanium structure housing ultra high-speed A17 processing blocks.", "https://unsplash.com"),
-            ("Xiaomi Redmi Note 13 Pro", 38500, "8GB RAM, 256GB Storage. Fast Charging Modules paired with 5000mAh cells.", "https://unsplash.com")
-        ]
-        cursor.executemany("INSERT INTO phones (name, price, description, image) VALUES (?, ?, ?, ?)", default_phones)
+        # --- ITEL SERIES (Budget & High-Value Tier) ---
+        ("itel S25 Pro", 18500, "8GB RAM, 256GB Storage. Ultra-slim Body Profiles combined with crisp AMOLED Glass.", "https://unsplash.com"),
+        ("itel S23 Plus", 21000, "8GB RAM, 256GB Storage. Immersive 3D Curved Panels and 50MP Portrait Hardware.", "https://unsplash.com"),
+        ("itel P55 5G", 16000, "6GB RAM, 128GB Storage. Extremely Cost-Effective 5G Connectivity Module.", "https://unsplash.com"),
+        ("itel A70", 12800, "4GB RAM, 128GB Storage. Modern Structural Form designed for reliable daily operations.", "https://unsplash.com"),
+        ("itel A05s", 9500, "2GB RAM, 32GB Storage. Affordable Entry Tier device ideal for basic application browsing.", "https://unsplash.com"),
+        
+        # --- PREFERRED HISTORICAL ENTRIES ---
+        ("iPhone 15 Pro Max", 165000, "256GB Storage. Elegant Titanium structure housing ultra high-speed A17 processing blocks.", "https://unsplash.com"),
+        ("Xiaomi Redmi Note 13 Pro", 38500, "8GB RAM, 256GB Storage. Fast Charging Modules paired with 5000mAh cells.", "https://unsplash.com")
+    ]
+    cursor.executemany("INSERT INTO phones (name, price, description, image) VALUES (?, ?, ?, ?)", default_phones)
     conn.commit()
     conn.close()
 
@@ -188,5 +192,3 @@ def pay(phone_id):
 def orders():
     if 'user' not in session:
         flash("Please log in to view your orders!", "danger")
-        return redirect(url_for('login'))
-    conn = get_db_connection()
