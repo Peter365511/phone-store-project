@@ -7,8 +7,8 @@ app = Flask(__name__)
 app.secret_key = 'kenya_phone_store_secret_key'
 
 def get_db_connection():
-    # Bumping to store_v6 forces Render to wipe the old cached database and load the new images instantly
-    conn = sqlite3.connect('store_v6.db')
+    # CRITICAL: Changing the database name forces Render to break cache and seed the new image links instantly
+    conn = sqlite3.connect('store_v10.db')
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -48,7 +48,7 @@ def init_db():
     if not cursor.fetchone():
         cursor.execute("INSERT INTO users (username, password) VALUES ('admin', '1234')")
         
-    # 17 High-Resolution, Direct Production Smartphone Images
+    # 17 High-Resolution, Direct Production Smartphone Stock Images
     default_phones = [
         # --- PREMIUM ULTRA LAYERS ---
         ("Samsung Galaxy S25 Ultra", 165000, "12GB RAM, 512GB Storage. Flagship performance device.", "https://unsplash.com"),
@@ -196,4 +196,3 @@ def admin_panel():
     conn.close()
     return render_template('admin.html', phones=all_phones, orders=all_orders)
 
-if __name__ == '__main__':
