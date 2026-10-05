@@ -14,11 +14,14 @@
         input, textarea { width: 100%; padding: 10px; border: 1px solid #bdc3c7; border-radius: 6px; box-sizing: border-box; }
         .btn { background: #27ae60; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; }
         .btn:hover { background: #219653; }
-        .table-container { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
         th { background-color: #34495e; color: white; }
-        .delete-btn { background: #e74c3c; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 0.85rem; }
+        .delete-btn { background: #e74c3c; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; }
+        
+        /* 📄 Downloader Token Styling Elements */
+        .download-btn { background: #2980b9; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 0.85rem; border: none; cursor: pointer; display: inline-block; }
+        .download-btn:hover { background: #1f618d; }
     </style>
 </head>
 <body>
@@ -30,94 +33,123 @@
         </div>
 
         <div class="grid-split">
-            <!-- Left Side: Add Inventory -->
             <div>
                 <h3>Add New Product</h3>
                 <form method="POST">
                     <input type="hidden" name="add_phone" value="1">
                     <div class="form-group">
                         <label>Device Full Name</label>
-                        <input type="text" name="name" placeholder="e.g., Tecno Camon 40 Pro" required>
+                        <input type="text" name="name" placeholder="e.g., Tecno Camon 30 Pro" required>
                     </div>
                     <div class="form-group">
                         <label>Price (KSh)</label>
-                        <input type="number" name="price" placeholder="e.g., 45000" required>
+                        <input type="number" name="price" placeholder="e.g., 48000" required>
                     </div>
                     <div class="form-group">
                         <label>Hardware Description Specs</label>
                         <textarea name="description" rows="3" placeholder="RAM, Storage details..." required></textarea>
                     </div>
-                    <div class="form-group">
-                        <label>Image Field Code (Optional)</label>
-                        <input type="text" name="image" value="default.png">
-                    </div>
+                    <input type="hidden" name="image" value="vector_css">
                     <button type="submit" class="btn">Save Product to Database</button>
                 </form>
             </div>
 
-            <!-- Right Side: Existing Inventory Management -->
             <div>
                 <h3>Active Store Stock Inventory</h3>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Price</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for phone in phones %}
-                            <tr>
-                                <td>{{ phone.id }}</td>
-                                <td><strong>{{ phone.name }}</strong></td>
-                                <td>KSh {{ "{:,}".format(phone.price) }}</td>
-                                <td>
-                                    <form method="POST" style="display:inline;">
-                                        <input type="hidden" name="delete_id" value="{{ phone.id }}">
-                                        <button type="submit" class="delete-btn" onclick="return confirm('Completely remove this smartphone listing?')">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div style="margin-top: 40px;">
-            <h3>🛒 Safaricom M-Pesa Incoming Order Log Stream</h3>
-            <div class="table-container">
                 <table>
                     <thead>
                         <tr>
-                            <th>Order ID</th>
-                            <th>Customer</th>
-                            <th>Device purchased</th>
-                            <th>Amount Paid</th>
-                            <th>M-Pesa Number</th>
-                            <th>Timestamp</th>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for order in orders %}
+                        {% for phone in phones %}
                         <tr>
-                            <td>ORD-{{ "%05d"|format(order.id) }}</td>
-                            <td>{{ order.username }}</td>
-                            <td>{{ order.item_name }}</td>
-                            <td style="color: #27ae60; font-weight: bold;">KSh {{ "{:,}".format(order.amount) }}</td>
-                            <td>{{ order.phone_number }}</td>
-                            <td><small>{{ order.timestamp }}</small></td>
+                            <td>#{{ phone.id }}</td>
+                            <td><strong>{{ phone.name }}</strong></td>
+                            <td>KSh {{ "{:,}".format(phone.price) }}</td>
+                            <td>
+                                <form method="POST" style="display:inline;">
+                                    <input type="hidden" name="delete_id" value="{{ phone.id }}">
+                                    <button type="submit" class="delete-btn">Delete</button>
+                                </form>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
+
+        <!-- M-Pesa Order Logs with Automated Client Text Receipt Downloader Attachment Actions -->
+        <div style="margin-top: 40px;">
+            <h3>🛒 Safaricom M-Pesa Incoming Order Log Stream</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Device Name</th>
+                        <th>Amount Paid</th>
+                        <th>M-Pesa Number</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>ORD-{{ "%05d"|format(order.id) }}</td>
+                        <td>{{ order.username }}</td>
+                        <td>{{ order.item_name }}</td>
+                        <td style="color: #27ae60; font-weight: bold;">KSh {{ "{:,}".format(order.amount) }}</td>
+                        <td>{{ order.phone_number }}</td>
+                        <td>
+                            <!-- ⚡ Client Side Script Injection Layer to download custom generated receipts instantly -->
+                            <button class="download-btn" onclick="downloadTXTInvoice('ORD-{{ '%05d'|format(order.id) }}', '{{ order.username }}', '{{ order.item_name }}', '{{ order.amount }}', '{{ order.phone_number }}', '{{ order.timestamp }}')">
+                                Download Invoice
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
+    <!-- 📄 JavaScript Text Invoice Blob Delivery Compiler Engine -->
+    <script>
+        function downloadTXTInvoice(orderId, customer, item, price, phone, timestamp) {
+            let formattedPrice = parseFloat(price).toLocaleString('en-US');
+            let invoiceContent = `==================================================\n` +
+                                 `              KENYA PHONE HUB STORE               \n` +
+                                 `            OFFICIAL PAYMENT INVOICE              \n` +
+                                 `==================================================\n` +
+                                 `Invoice ID       : ${orderId}\n` +
+                                 `Date & Time      : ${timestamp}\n` +
+                                 `Customer Name    : ${customer}\n` +
+                                 `Payment Channel  : Safaricom M-Pesa Express\n` +
+                                 `==================================================\n` +
+                                 `ITEM DETAILS:\n` +
+                                 `Product Name     : ${item}\n` +
+                                 `Total Paid       : KSh ${formattedPrice}.00\n` +
+                                 `M-Pesa Number    : ${phone}\n` +
+                                 `Transaction State: SUCCESSFUL / PAID\n` +
+                                 `==================================================\n` +
+                                 `         Thank you for shopping with us!          \n` +
+                                 `==================================================`;
+
+            let blob = new Blob([invoiceContent], { type: "text/plain;charset=utf-8" });
+            let link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `invoice_${orderId}.txt`;
+            link.style.display = "none";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
 </body>
 </html>
