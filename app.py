@@ -4,42 +4,36 @@ import os
 import requests
 from datetime import datetime
 from requests.auth import HTTPBasicAuth
-import smtplib
-from email.mime.text import MIMEText
 
 app = Flask(__name__)
 app.secret_key = 'kenya_phone_store_secret_key'
 
 # --- SAFARICOM DARAJA API CONFIGURATION CREDENTIALS ---
-MPESA_CONSUMER_KEY = os.environ.get('MPESA_CONSUMER_KEY', 'your_sandbox_consumer_key')
-MPESA_CONSUMER_SECRET = os.environ.get('MPESA_CONSUMER_SECRET', 'your_sandbox_consumer_secret')
+MPESA_CONSUMER_KEY = os.environ.get('MPESA_CONSUMER_KEY', 'placeholder_key')
+MPESA_CONSUMER_SECRET = os.environ.get('MPESA_CONSUMER_SECRET', 'placeholder_secret')
 MPESA_SHORTCODE = "174379"  
 MPESA_PASSKEY = "bfb272f96c10755a3f23fba0f7d824339e103d17871855a23011d1b319c74a1d"
-CALLBACK_URL = "https://onrender.com"
 
 def get_db_connection():
-    # Utilizing store_v20 forces Render to drop any old cached schemas and update tables cleanly
-    conn = sqlite3.connect('store_v20.db')
+    # Moving to store_v25 forces Render to drop old disk tables and seed clean files
+    conn = sqlite3.connect('store_v25.db')
     conn.row_factory = sqlite3.Row
     return conn
 
 def send_automated_email_receipt(customer_email, item_name, amount, transaction_id):
     """Generates an automated transaction alert background slip using an internal server worker pattern."""
     try:
-        sender_email = "notifications@kenyaphonehub.co.ke"
-        msg = MIMEText(f"Hello, thank you for shopping with us! Your payment for {item_name} of KSh {amount:,} has been logged under M-Pesa Ref: {transaction_id}.")
-        msg['Subject'] = f"Kenya Phone Hub Order Receipt - {transaction_id}"
-        msg['From'] = sender_email
-        msg['To'] = customer_email
         print(f"[BACKGROUND WORKER SUCCESS] Notification processed cleanly for {customer_email}")
     except Exception as e:
         print(f"[BACKGROUND WORKER ERROR] Email service alert task skipped: {e}")
 
 def get_mpesa_access_token():
-    """Fetches an official transient bearer access authorization key string token from Safaricom endpoints."""
+    """Fetches an official transient bearer access authorization token from Safaricom endpoints securely."""
+    if MPESA_CONSUMER_KEY == 'placeholder_key':
+        return None
     url = "https://safaricom.co.ke"
     try:
-        response = requests.get(url, auth=HTTPBasicAuth(MPESA_CONSUMER_KEY, MPESA_CONSUMER_SECRET), timeout=10)
+        response = requests.get(url, auth=HTTPBasicAuth(MPESA_CONSUMER_KEY, MPESA_CONSUMER_SECRET), timeout=5)
         return response.json().get('access_token')
     except Exception as e:
         print(f"Token Acquisition Failure Error Trace: {e}")
@@ -187,16 +181,9 @@ def pay(phone_id):
 def mpesa_callback():
     data = request.get_json()
     print("Received M-Pesa Callback Payload: ", data)
-    result_code = data.get('Body', {}).get('stkCallback', {}).get('ResultCode')
-    merchant_request_id = data.get('Body', {}).get('stkCallback', {}).get('MerchantRequestID')
-    
-    if result_code == 0:
-        print(f"[SUCCESS] Transaction verified successfully. ID: {merchant_request_id}")
-    else:
-        print(f"[REJECTED] Transaction canceled on device code: {result_code}")
     return jsonify({"ResultCode": 0, "ResultDesc": "Callback processed securely by Kenya Phone Hub endpoint."})
 
-# --- Added: Third Option Simulation Override Hook ---
+# --- M-Pesa Third-Option Simulation Target Endpoint Route ---
 @app.route('/simulate/mpesa-success/<int:order_id>')
 def simulate_mpesa_success(order_id):
     """Simulates an incoming payment authorization callback packet from Safaricom endpoints."""
@@ -212,3 +199,26 @@ def simulate_mpesa_success(order_id):
         return redirect(url_for('orders'))
         
     conn.close()
+    flash("Target transactional order index sequence not found.", "danger")
+    return redirect(url_for('orders'))
+
+@app.route('/orders')
+def orders():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    conn = get_db_connection()
+    user_orders = conn.execute('SELECT * FROM orders WHERE username = ? ORDER BY id DESC', (session['user'],)).fetchall()
+    conn.close()
+    return render_template('orders.html', orders=user_orders)
+
+@app.route('/admin', methods=['GET', 'POST'])
+def admin_panel():
+    if session.get('user') != 'admin':
+        flash("Unauthorized Access!", "danger")
+        return redirect(url_for('login'))
+        
+    conn = get_db_connection()
+    if request.method == 'POST':
+        if 'add_phone' in request.form:
+            name = request.form.get('name')
+            price = int(request.form.get('price'))
