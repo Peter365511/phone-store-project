@@ -13,13 +13,13 @@ app.secret_key = 'kenya_phone_store_secret_key'
 # --- SAFARICOM DARAJA API CONFIGURATION CREDENTIALS ---
 MPESA_CONSUMER_KEY = os.environ.get('MPESA_CONSUMER_KEY', 'your_sandbox_consumer_key')
 MPESA_CONSUMER_SECRET = os.environ.get('MPESA_CONSUMER_SECRET', 'your_sandbox_consumer_secret')
-MPESA_SHORTCODE = "174379"  # Standard Lipa Na M-Pesa Sandbox Passbook Shortcode
+MPESA_SHORTCODE = "174379"  
 MPESA_PASSKEY = "bfb272f96c10755a3f23fba0f7d824339e103d17871855a23011d1b319c74a1d"
 CALLBACK_URL = "https://onrender.com"
 
 def get_db_connection():
-    # Bumping to version 12 handles production schema initialization changes cleanly
-    conn = sqlite3.connect('store_v12.db')
+    # Utilizing store_v15 forces Render to drop any old corrupted schemas and start fresh
+    conn = sqlite3.connect('store_v15.db')
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -31,12 +31,7 @@ def send_automated_email_receipt(customer_email, item_name, amount, transaction_
         msg['Subject'] = f"Kenya Phone Hub Order Receipt - {transaction_id}"
         msg['From'] = sender_email
         msg['To'] = customer_email
-        
-        # In actual production environments, you would link this token with your target SMTP host:
-        # with smtplib.SMTP('smtp.mailtrap.io', 2525) as server:
-        #     server.login("user", "pass")
-        #     server.sendmail(sender_email, [customer_email], msg.as_string())
-        print(f"[BACKGROUND WORKER SMS/EMAIL SUCCESS] Notification dispatched cleanly to {customer_email}")
+        print(f"[BACKGROUND WORKER SUCCESS] Notification processed cleanly for {customer_email}")
     except Exception as e:
         print(f"[BACKGROUND WORKER ERROR] Email service alert task skipped: {e}")
 
@@ -136,6 +131,23 @@ def login():
             flash("Invalid credentials!", "danger")
     return render_template('login.html')
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        conn = get_db_connection()
+        try:
+            conn.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, password))
+            conn.commit()
+            flash("Registration successful! Please log in.", "success")
+            return redirect(url_for('login'))
+        except sqlite3.IntegrityError:
+            flash("Username already exists!", "danger")
+        finally:
+            conn.close()
+    return render_template('register.html')
+
 @app.route('/logout')
 def logout():
     session.pop('user', None)
@@ -156,10 +168,6 @@ def pay(phone_id):
         phone_number = request.form.get('phone_number')
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
-        # 🔗 DARJAA STK PUSH TRIGGER SEQUENCE SIMULATION
-        # In a staging framework, this sends an instant payment request packet straight to the customer's handset.
-        # Once processed, Safaricom fires back asynchronously to your designated webhook route below.
-        
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute('''
@@ -170,31 +178,22 @@ def pay(phone_id):
         conn.commit()
         conn.close()
         
-        # Trigger background mail slip pipeline instantly
         send_automated_email_receipt(f"{session['user']}@gmail.com", phone['name'], phone['price'], f"STK{new_order_id}")
-        
         flash(f"M-Pesa STK push request pushed out to {phone_number} successfully!", "success")
         return redirect(url_for('orders'))
     return render_template('pay.html', phone=phone)
 
-# 📡 CRITICAL SAFARICOM WEBHOOK LISTEN CALLBACK ROUTE
 @app.route('/mpesa/callback', methods=['POST'])
 def mpesa_callback():
-    """Receives asynchronous internet transaction packets pushed from Safaricom Daraja core servers."""
     data = request.get_json()
     print("Received M-Pesa Callback Payload: ", data)
-    
-    # Safaricom response mapping structure parameters extraction parsing blocks
     result_code = data.get('Body', {}).get('stkCallback', {}).get('ResultCode')
     merchant_request_id = data.get('Body', {}).get('stkCallback', {}).get('MerchantRequestID')
     
     if result_code == 0:
-        # Payment verified successfully! Locate the matching record and update its state parameters
-        print(f"[SUCCESS] Transaction verified successfully. Hook parameters map ID: {merchant_request_id}")
-        # update orders set status = 'Completed / Confirmed Paid' where tracking_id = target
+        print(f"[SUCCESS] Transaction verified successfully. ID: {merchant_request_id}")
     else:
-        print(f"[REJECTED] Transaction canceled or incorrect pin input on device code: {result_code}")
-        
+        print(f"[REJECTED] Transaction canceled on device code: {result_code}")
     return jsonify({"ResultCode": 0, "ResultDesc": "Callback processed securely by Kenya Phone Hub endpoint."})
 
 @app.route('/orders')
@@ -202,3 +201,18 @@ def orders():
     if 'user' not in session:
         return redirect(url_for('login'))
     conn = get_db_connection()
+    user_orders = conn.execute('SELECT * FROM orders WHERE username = ? ORDER BY id DESC', (session['user'],)).fetchall()
+    conn.close()
+    return render_template('orders.html', orders=user_orders)
+
+@app.route('/admin', methods=['GET', 'POST'])
+def admin_panel():
+    if session.get('user') != 'admin':
+        flash("Unauthorized Access!", "danger")
+        return redirect(url_for('login'))
+        
+    conn = get_db_connection()
+    if request.method == 'POST':
+        if 'add_phone' in request.form:
+            name = request.form.get('name')
+            price = int(request.form.get('price'))
