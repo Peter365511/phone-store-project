@@ -1,77 +1,83 @@
- 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | PhoneStore</title>
-    <script src="https://tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard Portal</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f1f3f6; margin: 0; padding: 20px; }
+        .admin-box { max-width: 1100px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2, h3 { color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; }
+        .grid-split { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; margin-top: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #34495e; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #bdc3c7; border-radius: 6px; box-sizing: border-box; }
+        .btn { background: #27ae60; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; }
+        .btn:hover { background: #219653; }
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
+        th { background-color: #34495e; color: white; }
+        .delete-btn { background: #e74c3c; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none; font-size: 0.85rem; }
+    </style>
 </head>
-<body class="bg-slate-100 font-sans text-slate-800 antialiased min-h-screen">
+<body>
 
-    <!-- Admin Header Component -->
-    <nav class="bg-slate-950 text-white p-4 sticky top-0 shadow-md z-50">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-black tracking-tight text-amber-400">🛡️ Central Admin Terminal</h1>
-            <div class="flex items-center space-x-4">
-                <a href="/" class="text-slate-300 hover:text-white font-medium text-sm transition">View Shop</a>
-                <a href="/logout" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition">Exit Console</a>
+    <div class="admin-box">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>🛠️ Phone Store Management Panel</h2>
+            <a href="/" style="background: #34495e; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-weight: bold;">View Live Shop</a>
+        </div>
+
+        <div class="grid-split">
+            <!-- Left Side: Add Inventory -->
+            <div>
+                <h3>Add New Product</h3>
+                <form method="POST">
+                    <input type="hidden" name="add_phone" value="1">
+                    <div class="form-group">
+                        <label>Device Full Name</label>
+                        <input type="text" name="name" placeholder="e.g., Tecno Camon 40 Pro" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Price (KSh)</label>
+                        <input type="number" name="price" placeholder="e.g., 45000" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Hardware Description Specs</label>
+                        <textarea name="description" rows="3" placeholder="RAM, Storage details..." required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Image Field Code (Optional)</label>
+                        <input type="text" name="image" value="default.png">
+                    </div>
+                    <button type="submit" class="btn">Save Product to Database</button>
+                </form>
             </div>
-        </div>
-    </nav>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}{% for category, msg in messages %}
-        <div class="max-w-7xl mx-auto px-4 mt-4"><div class="p-4 rounded-xl text-sm font-bold bg-white border border-slate-200 text-slate-900 shadow-sm">{{ msg }}</div></div>
-      {% endfor %}{% endif %}
-    {% endwith %}
-
-    <main class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        <!-- Section A: Live Store Inventory Control Input Form Box -->
-        <div class="bg-white p-6 border border-slate-200 rounded-2xl shadow-sm h-fit">
-            <h2 class="text-lg font-black text-slate-900 mb-4 tracking-tight border-b pb-2">Add New Inventory</h2>
-            <form method="POST" class="space-y-4">
-                <input type="hidden" name="add_phone" value="1">
-                <div>
-                    <label class="block text-xs font-bold uppercase text-slate-400">Phone Model Name</label>
-                    <input type="text" name="name" placeholder="e.g. Google Pixel 8 Pro" required class="mt-1 block w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold uppercase text-slate-400">Pricing (KSh)</label>
-                    <input type="number" name="price" placeholder="e.g. 95000" required class="mt-1 block w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold uppercase text-slate-400">Image Cover URL Link</label>
-                    <input type="url" name="image" placeholder="https://unsplash.com..." required class="mt-1 block w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold uppercase text-slate-400">Technical Product Summary Description</label>
-                    <textarea name="description" rows="3" placeholder="Enter key metrics, hardware specifications..." required class="mt-1 block w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
-                </div>
-                <button type="submit" class="w-full bg-slate-900 hover:bg-emerald-600 text-white font-bold py-2 rounded-xl text-sm transition">
-                    Publish to Live Site
-                </button>
-            </form>
-        </div>
-
-        <!-- Section B: Live Inventory Catalog Manager Table View -->
-        <div class="lg:col-span-2 space-y-8">
-            <div class="bg-white p-6 border border-slate-200 rounded-2xl shadow-sm">
-                <h2 class="text-lg font-black text-slate-900 mb-4 tracking-tight border-b pb-2">Active Products Catalog</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
+            <!-- Right Side: Existing Inventory Management -->
+            <div>
+                <h3>Active Store Stock Inventory</h3>
+                <div class="table-container">
+                    <table>
                         <thead>
-                            <tr class="text-slate-400 border-b"><th class="py-2">Item</th><th class="py-2">Price</th><th class="py-2 text-right">Action</th></tr>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Actions</th>
+                            </tr>
                         </thead>
-                        <tbody class="divide-y">
-                            {% for phone in products %}
-                            <tr class="align-middle">
-                                <td class="py-3 font-bold text-slate-900">{{ phone.name }}</td>
-                                <td class="py-3 text-slate-600">KSh {{ "{:,}".format(phone.price) }}</td>
-                                <td class="py-3 text-right">
-                                    <form method="POST" onsubmit="return confirm('Remove this listing from store database?');">
+                        <tbody>
+                            {% for phone in phones %}
+                            <tr>
+                                <td>{{ phone.id }}</td>
+                                <td><strong>{{ phone.name }}</strong></td>
+                                <td>KSh {{ "{:,}".format(phone.price) }}</td>
+                                <td>
+                                    <form method="POST" style="display:inline;">
                                         <input type="hidden" name="delete_id" value="{{ phone.id }}">
-                                        <button type="submit" class="text-xs bg-red-50 text-red-600 hover:bg-red-100 px-2.5 py-1 rounded-md font-bold transition">Delete</button>
+                                        <button type="submit" class="delete-btn" onclick="return confirm('Completely remove this smartphone listing?')">Delete</button>
                                     </form>
                                 </td>
                             </tr>
@@ -80,25 +86,38 @@
                     </table>
                 </div>
             </div>
+        </div>
 
-            <!-- Section C: Global Customer Order Ledger Monitor Panel -->
-            <div class="bg-white p-6 border border-slate-200 rounded-2xl shadow-sm">
-                <h2 class="text-lg font-black text-slate-900 mb-4 tracking-tight border-b pb-2">Global Store Sales Logs</h2>
-                <div class="space-y-3">
-                    {% for order in orders %}
-                    <div class="text-xs p-3 bg-slate-50 border border-slate-100 rounded-xl flex justify-between items-center">
-                        <div>
-                            <p class="font-bold text-slate-800">User Account: <span class="text-indigo-600">{{ order.username }}</span></p>
-                            <p class="text-slate-500 font-medium mt-0.5">Purchased: {{ order.item_name }} (via {{ order.phone_number }})</p>
-                            <span class="text-[10px] text-slate-400 block mt-1">{{ order.timestamp }}</span>
-                        </div>
-                        <span class="text-sm font-black text-slate-900">KSh {{ "{:,}".format(order.amount) }}</span>
-                    </div>
-                    {% endfor %}
-                </div>
+        <div style="margin-top: 40px;">
+            <h3>🛒 Safaricom M-Pesa Incoming Order Log Stream</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Device purchased</th>
+                            <th>Amount Paid</th>
+                            <th>M-Pesa Number</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>ORD-{{ "%05d"|format(order.id) }}</td>
+                            <td>{{ order.username }}</td>
+                            <td>{{ order.item_name }}</td>
+                            <td style="color: #27ae60; font-weight: bold;">KSh {{ "{:,}".format(order.amount) }}</td>
+                            <td>{{ order.phone_number }}</td>
+                            <td><small>{{ order.timestamp }}</small></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
-    </main>
+    </div>
 
 </body>
 </html>
