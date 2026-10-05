@@ -1,43 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 import sqlite3
 import os
-import requests
 from datetime import datetime
-from requests.auth import HTTPBasicAuth
 
 app = Flask(__name__)
 app.secret_key = 'kenya_phone_store_secret_key'
 
-# --- SAFARICOM DARAJA API CONFIGURATION CREDENTIALS ---
-MPESA_CONSUMER_KEY = os.environ.get('MPESA_CONSUMER_KEY', 'placeholder_key')
-MPESA_CONSUMER_SECRET = os.environ.get('MPESA_CONSUMER_SECRET', 'placeholder_secret')
-MPESA_SHORTCODE = "174379"  
-MPESA_PASSKEY = "bfb272f96c10755a3f23fba0f7d824339e103d17871855a23011d1b319c74a1d"
-
 def get_db_connection():
-    # Moving to store_v25 forces Render to drop old disk tables and seed clean files
-    conn = sqlite3.connect('store_v25.db')
+    # Moving to store_v30 resets any old database cache states on Render completely
+    conn = sqlite3.connect('store_v30.db')
     conn.row_factory = sqlite3.Row
     return conn
-
-def send_automated_email_receipt(customer_email, item_name, amount, transaction_id):
-    """Generates an automated transaction alert background slip using an internal server worker pattern."""
-    try:
-        print(f"[BACKGROUND WORKER SUCCESS] Notification processed cleanly for {customer_email}")
-    except Exception as e:
-        print(f"[BACKGROUND WORKER ERROR] Email service alert task skipped: {e}")
-
-def get_mpesa_access_token():
-    """Fetches an official transient bearer access authorization token from Safaricom endpoints securely."""
-    if MPESA_CONSUMER_KEY == 'placeholder_key':
-        return None
-    url = "https://safaricom.co.ke"
-    try:
-        response = requests.get(url, auth=HTTPBasicAuth(MPESA_CONSUMER_KEY, MPESA_CONSUMER_SECRET), timeout=5)
-        return response.json().get('access_token')
-    except Exception as e:
-        print(f"Token Acquisition Failure Error Trace: {e}")
-        return None
 
 def init_db():
     conn = get_db_connection()
@@ -105,6 +78,7 @@ def home():
     conn = get_db_connection()
     db_phones = conn.execute('SELECT * FROM phones').fetchall()
     conn.close()
+    # Sending variable explicitly under 'products' to align with index templates
     return render_template('index.html', products=db_phones)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -172,34 +146,22 @@ def pay(phone_id):
         conn.commit()
         conn.close()
         
-        send_automated_email_receipt(f"{session['user']}@gmail.com", phone['name'], phone['price'], f"STK{new_order_id}")
         flash(f"M-Pesa STK push request pushed out to {phone_number} successfully!", "success")
         return redirect(url_for('orders'))
     return render_template('pay.html', phone=phone)
 
-@app.route('/mpesa/callback', methods=['POST'])
-def mpesa_callback():
-    data = request.get_json()
-    print("Received M-Pesa Callback Payload: ", data)
-    return jsonify({"ResultCode": 0, "ResultDesc": "Callback processed securely by Kenya Phone Hub endpoint."})
-
-# --- M-Pesa Third-Option Simulation Target Endpoint Route ---
 @app.route('/simulate/mpesa-success/<int:order_id>')
 def simulate_mpesa_success(order_id):
-    """Simulates an incoming payment authorization callback packet from Safaricom endpoints."""
     conn = get_db_connection()
     cursor = conn.cursor()
     order = cursor.execute('SELECT * FROM orders WHERE id = ?', (order_id,)).fetchone()
-    
     if order:
         cursor.execute("UPDATE orders SET status = 'Paid via M-Pesa (Verified Confirmation)' WHERE id = ?", (order_id,))
         conn.commit()
         conn.close()
         flash(f"Safaricom Mock Callback simulated successfully for Order #ORD-{order_id:05d}!", "success")
         return redirect(url_for('orders'))
-        
     conn.close()
-    flash("Target transactional order index sequence not found.", "danger")
     return redirect(url_for('orders'))
 
 @app.route('/orders')
@@ -222,3 +184,23 @@ def admin_panel():
         if 'add_phone' in request.form:
             name = request.form.get('name')
             price = int(request.form.get('price'))
+            description = request.form.get('description')
+            image = request.form.get('image')
+            conn.execute('INSERT INTO phones (name, price, description, image) VALUES (?, ?, ?, ?)', 
+                         (name, price, description, image))
+            conn.commit()
+            flash(f"Successfully added {name}!", "success")
+        elif 'delete_id' in request.form:
+            delete_id = request.form.get('delete_id')
+            conn.execute('DELETE FROM phones WHERE id = ?', (delete_id,))
+            conn.commit()
+            flash("Listing removed.", "info")
+        return redirect(url_for('admin_panel'))
+        
+    all_phones = conn.execute('SELECT * FROM phones ORDER BY id DESC').fetchall()
+    all_orders = conn.execute('SELECT * FROM orders ORDER BY id DESC').fetchall()
+    conn.close()
+    return render_template('admin.html', phones=all_phones, orders=all_orders)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
