@@ -18,8 +18,8 @@ MPESA_PASSKEY = "bfb272f96c10755a3f23fba0f7d824339e103d17871855a23011d1b319c74a1
 CALLBACK_URL = "https://onrender.com"
 
 def get_db_connection():
-    # Utilizing store_v15 forces Render to drop any old corrupted schemas and start fresh
-    conn = sqlite3.connect('store_v15.db')
+    # Utilizing store_v20 forces Render to drop any old cached schemas and update tables cleanly
+    conn = sqlite3.connect('store_v20.db')
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -196,23 +196,19 @@ def mpesa_callback():
         print(f"[REJECTED] Transaction canceled on device code: {result_code}")
     return jsonify({"ResultCode": 0, "ResultDesc": "Callback processed securely by Kenya Phone Hub endpoint."})
 
-@app.route('/orders')
-def orders():
-    if 'user' not in session:
-        return redirect(url_for('login'))
+# --- Added: Third Option Simulation Override Hook ---
+@app.route('/simulate/mpesa-success/<int:order_id>')
+def simulate_mpesa_success(order_id):
+    """Simulates an incoming payment authorization callback packet from Safaricom endpoints."""
     conn = get_db_connection()
-    user_orders = conn.execute('SELECT * FROM orders WHERE username = ? ORDER BY id DESC', (session['user'],)).fetchall()
-    conn.close()
-    return render_template('orders.html', orders=user_orders)
-
-@app.route('/admin', methods=['GET', 'POST'])
-def admin_panel():
-    if session.get('user') != 'admin':
-        flash("Unauthorized Access!", "danger")
-        return redirect(url_for('login'))
+    cursor = conn.cursor()
+    order = cursor.execute('SELECT * FROM orders WHERE id = ?', (order_id,)).fetchone()
+    
+    if order:
+        cursor.execute("UPDATE orders SET status = 'Paid via M-Pesa (Verified Confirmation)' WHERE id = ?", (order_id,))
+        conn.commit()
+        conn.close()
+        flash(f"Safaricom Mock Callback simulated successfully for Order #ORD-{order_id:05d}!", "success")
+        return redirect(url_for('orders'))
         
-    conn = get_db_connection()
-    if request.method == 'POST':
-        if 'add_phone' in request.form:
-            name = request.form.get('name')
-            price = int(request.form.get('price'))
+    conn.close()

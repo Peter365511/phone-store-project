@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kenya Phone Hub Store</title>
     <style>
-        /* Define Root Level Theme Variable Hooks */
+        /* CSS variables to enable the fluid theme switching engine */
         :root { --bg-primary: #f4f6f9; --bg-card: #ffffff; --text-main: #333333; --text-muted: #7f8c8d; --border-color: #eef2f5; }
         [data-theme="dark"] { --bg-primary: #0f172a; --bg-card: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8; --border-color: #334155; }
 
@@ -14,14 +14,15 @@
         .nav-links { position: absolute; top: 25px; right: 20px; display: flex; align-items: center; gap: 10px; }
         .nav-links a { color: white; text-decoration: none; font-weight: bold; background: rgba(255,255,255,0.15); padding: 7px 16px; border-radius: 6px; font-size: 0.9rem; }
         
-        /* 🌗 Theme Toggle Switch Interface Box Styling */
         .theme-toggle-btn { background: #f39c12; color: white; border: none; padding: 7px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s; font-size: 0.9rem; }
         .theme-toggle-btn:hover { background: #d35400; }
 
         .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
         .filter-section { background: var(--bg-card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); margin-bottom: 30px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; border: 1px solid var(--border-color); }
         .search-input { flex: 1; min-width: 250px; padding: 12px 18px; border: 2px solid var(--border-color); background: var(--bg-primary); color: var(--text-main); border-radius: 8px; font-size: 1rem; outline: none; }
-        .filter-btn { background: rgba(148,163,184,0.1); color: var(--text-main); border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        
+        .filter-buttons { display: flex; gap: 10px; }
+        .filter-btn { background: rgba(148,163,184,0.1); color: var(--text-main); border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         .filter-btn.active { background: #2980b9; color: white; }
 
         .phone-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
@@ -55,7 +56,6 @@
 
     <div class="header">
         <div class="nav-links">
-            <!-- 🌗 Theme Switch Mode Toggle Button Trigger Grid Entry -->
             <button class="theme-toggle-btn" id="themeSwitcher" onclick="toggleDisplayTheme()">🌙 Dark Mode</button>
             <a href="/">Home</a>
             {% if session.get('user') %}
@@ -70,6 +70,7 @@
     </div>
 
     <div class="container">
+        <!-- Live Interactive Input Fields Panel -->
         <div class="filter-section">
             <input type="text" id="storeSearch" class="search-input" placeholder="Search by model name or specifications..." onkeyup="filterStoreCatalog()">
             <div class="filter-buttons">
@@ -124,6 +125,7 @@
         </div>
     </div>
 
+    <!-- Frontend Interactive JavaScript Component -->
     <script>
         let currentActiveBrand = 'all';
 
@@ -145,5 +147,4 @@
             filterStoreCatalog();
         }
 
-        // ⚡ Persistent Client-Side Theme Selection Engine
         function toggleDisplayTheme() {
