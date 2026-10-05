@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 import sqlite3
 import os
@@ -8,17 +7,15 @@ app = Flask(__name__)
 app.secret_key = 'kenya_phone_store_secret_key'
 
 def get_db_connection():
-    conn = sqlite3.connect('store.db')
+    # We update the database version to store_v3 to force Render to re-run the seeds instantly
+    conn = sqlite3.connect('store_v3.db')
     conn.row_factory = sqlite3.Row
     return conn
 
 def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
-    
-    # CRITICAL: Force-clear existing tables to clear cached 3-phone inventories on Render
     cursor.execute('DROP TABLE IF EXISTS phones')
-    
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -51,34 +48,34 @@ def init_db():
     if not cursor.fetchone():
         cursor.execute("INSERT INTO users (username, password) VALUES ('admin', '1234')")
         
-    # Seed data with working public smartphone images instead of generic homepage text links
+    # Seed data utilizing open-source mobile phone images that bypass link restrictions
     default_phones = [
-        # --- SAMSUNG S-ULTRA SERIES (Premium Flagship) ---
-        ("Samsung Galaxy S25 Ultra", 165000, "12GB RAM, 512GB Storage. Snapdragon 8 Gen 4, Pro-grade 200MP Camera Ecosystem.", "https://unsplash.com"),
-        ("Samsung Galaxy S24 Ultra", 135000, "12GB RAM, 256GB Storage. Solid Titanium Frame with Galaxy AI Machine Tools.", "https://unsplash.com"),
-        ("Samsung Galaxy S23 Ultra", 110000, "8GB RAM, 256GB Storage. High zoom 100x Space Engine & Built-in S-Pen Slot.", "https://unsplash.com"),
+        # --- PREMIUM ULTRA LAYERS ---
+        ("Samsung Galaxy S25 Ultra", 165000, "12GB RAM, 512GB Storage. Flagship performance device.", "https://wikimedia.org"),
+        ("Samsung Galaxy S24 Ultra", 135000, "12GB RAM, 256GB Storage. Solid Titanium Frame with Galaxy AI.", "https://wikimedia.org"),
+        ("Samsung Galaxy S23 Ultra", 110000, "8GB RAM, 256GB Storage. 100x Zoom Space Engine & S-Pen.", "https://wikimedia.org"),
         
-        # --- SAMSUNG A SERIES (Balanced Mid-Tier) ---
-        ("Samsung Galaxy A55 5G", 54000, "8GB RAM, 128GB Storage. Premium Protective Metal Frame with Gorilla Glass Finish.", "https://unsplash.com"),
-        ("Samsung Galaxy A35 5G", 42000, "6GB RAM, 128GB Storage. Fluid Super AMOLED Screen & 50MP Stable Main Sensor.", "https://unsplash.com"),
-        ("Samsung Galaxy A15", 23000, "4GB RAM, 128GB Storage. Smooth 90Hz Display backed by a 5000mAh Battery.", "https://unsplash.com"),
+        # --- MID TIER SAMSUNG A SERIES ---
+        ("Samsung Galaxy A55 5G", 54000, "8GB RAM, 128GB Storage. Protective Metal Frame setup.", "https://wikimedia.org"),
+        ("Samsung Galaxy A35 5G", 42000, "6GB RAM, 128GB Storage. Super AMOLED Display panel.", "https://wikimedia.org"),
+        ("Samsung Galaxy A15", 23000, "4GB RAM, 128GB Storage. Smooth 90Hz Display core.", "https://wikimedia.org"),
 
-        # --- TECNO PERFORMANCE LAYERS (High Market Demand) ---
-        ("Tecno Camon 30 Pro 5G", 48000, "12GB RAM, 512GB Storage. Flagship Sony IMX890 Camera Unit with Dimensity Processing.", "https://unsplash.com"),
-        ("Tecno Camon 20 Premier", 39500, "8GB RAM, 512GB Storage. Artistic Geometric Leather Layer with Wide Angle Lens.", "https://unsplash.com"),
-        ("Tecno Spark 20 Pro+", 29000, "8GB RAM, 256GB Storage. Ergonomic Curved AMOLED Screen housing 108MP Sensor.", "https://unsplash.com"),
-        ("Tecno Spark 20 Go", 14500, "4GB RAM, 64GB Storage. Dynamic Notification UI Elements with Dual Speakers.", "https://unsplash.com"),
+        # --- TECNO PERFORMANCE PLATERS ---
+        ("Tecno Camon 30 Pro 5G", 48000, "12GB RAM, 512GB Storage. Flagship Dimensity Processing Unit.", "https://wikimedia.org"),
+        ("Tecno Camon 20 Premier", 39500, "8GB RAM, 512GB Storage. Premium Leather Design Layout.", "https://wikimedia.org"),
+        ("Tecno Spark 20 Pro+", 29000, "8GB RAM, 256GB Storage. Curved Ergonomic Display setup.", "https://wikimedia.org"),
+        ("Tecno Spark 20 Go", 14500, "4GB RAM, 64GB Storage. Dual Speakers with Dynamic UI.", "https://wikimedia.org"),
 
-        # --- ITEL SERIES (Budget & High-Value Tier) ---
-        ("itel S25 Pro", 18500, "8GB RAM, 256GB Storage. Ultra-slim Body Profiles combined with crisp AMOLED Glass.", "https://unsplash.com"),
-        ("itel S23 Plus", 21000, "8GB RAM, 256GB Storage. Immersive 3D Curved Panels and 50MP Portrait Hardware.", "https://unsplash.com"),
-        ("itel P55 5G", 16000, "6GB RAM, 128GB Storage. Extremely Cost-Effective 5G Connectivity Module.", "https://unsplash.com"),
-        ("itel A70", 12800, "4GB RAM, 128GB Storage. Modern Structural Form designed for reliable daily operations.", "https://unsplash.com"),
-        ("itel A05s", 9500, "2GB RAM, 32GB Storage. Affordable Entry Tier device ideal for basic application browsing.", "https://unsplash.com"),
+        # --- ITEL VALUE SERIES ---
+        ("itel S25 Pro", 18500, "8GB RAM, 256GB Storage. Slim Profile Body and AMOLED Screen.", "https://wikimedia.org"),
+        ("itel S23 Plus", 21000, "8GB RAM, 256GB Storage. Immersive 3D Curved Panels.", "https://wikimedia.org"),
+        ("itel P55 5G", 16000, "6GB RAM, 128GB Storage. Affordable 5G Module.", "https://wikimedia.org"),
+        ("itel A70", 12800, "4GB RAM, 128GB Storage. Built for reliable everyday performance.", "https://wikimedia.org"),
+        ("itel A05s", 9500, "2GB RAM, 32GB Storage. Essential tier for mobile browsing.", "https://wikimedia.org"),
         
-        # --- PREFERRED HISTORICAL ENTRIES ---
-        ("iPhone 15 Pro Max", 165000, "256GB Storage. Elegant Titanium structure housing ultra high-speed A17 processing blocks.", "https://unsplash.com"),
-        ("Xiaomi Redmi Note 13 Pro", 38500, "8GB RAM, 256GB Storage. Fast Charging Modules paired with 5000mAh cells.", "https://unsplash.com")
+        # --- ALTERNATIVE HISTORICAL DATA ---
+        ("iPhone 15 Pro Max", 165000, "256GB Storage. Premium High-speed Processing blocks.", "https://wikimedia.org"),
+        ("Xiaomi Redmi Note 13 Pro", 38500, "8GB RAM, 256GB Storage. 5000mAh long battery module.", "https://wikimedia.org")
     ]
     cursor.executemany("INSERT INTO phones (name, price, description, image) VALUES (?, ?, ?, ?)", default_phones)
     conn.commit()
@@ -192,3 +189,17 @@ def pay(phone_id):
 def orders():
     if 'user' not in session:
         flash("Please log in to view your orders!", "danger")
+        return redirect(url_for('login'))
+    conn = get_db_connection()
+    user_orders = conn.execute('SELECT * FROM orders WHERE username = ? ORDER BY id DESC', (session['user'],)).fetchall()
+    conn.close()
+    return render_template('orders.html', orders=user_orders)
+
+@app.route('/admin', methods=['GET', 'POST'])
+def admin_panel():
+    if session.get('user') != 'admin':
+        flash("Unauthorized Access!", "danger")
+        return redirect(url_for('login'))
+        
+    conn = get_db_connection()
+    if request.method == 'POST':
