@@ -7,8 +7,8 @@ app = Flask(__name__)
 app.secret_key = 'kenya_phone_store_secret_key'
 
 def get_db_connection():
-    # Moving to store_v30 resets any old database cache states on Render completely
-    conn = sqlite3.connect('store_v30.db')
+    # Bumping to version 40 completely drops old database states to prevent data errors
+    conn = sqlite3.connect('store_v40.db')
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -78,7 +78,7 @@ def home():
     conn = get_db_connection()
     db_phones = conn.execute('SELECT * FROM phones').fetchall()
     conn.close()
-    # Sending variable explicitly under 'products' to align with index templates
+    # Sending exact parameters labeled as 'products'
     return render_template('index.html', products=db_phones)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -142,7 +142,6 @@ def pay(phone_id):
             INSERT INTO orders (username, item_name, amount, phone_number, status, timestamp)
             VALUES (?, ?, ?, ?, ?, ?)
         ''', (session['user'], phone['name'], phone['price'], phone_number, 'Pending API M-Pesa Verification', timestamp))
-        new_order_id = cursor.lastrowid
         conn.commit()
         conn.close()
         
