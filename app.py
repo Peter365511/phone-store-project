@@ -7,8 +7,8 @@ app = Flask(__name__)
 app.secret_key = 'kenya_phone_store_secret_key'
 
 def get_db_connection():
-    # Bumping database version to store_v50 forces Render to wipe old cache states instantly
-    conn = sqlite3.connect('store_v50.db')
+    # Bumping database version to store_v60 forces Render to wipe old cache states instantly
+    conn = sqlite3.connect('store_v60.db')
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -124,12 +124,14 @@ def logout():
     flash("You have logged out.", "info")
     return redirect(url_for('home'))
 
-@app.route('/pay/<int:phone_id>', methods=['GET', 'POST'])
-def pay(phone_id):
+# FIXED: Standardized dynamic parameters mapping for flawless index matching execution
+@app.route('/pay', methods=['GET', 'POST'])
+def pay():
     if 'user' not in session:
         flash("Please log in to purchase products!", "danger")
         return redirect(url_for('login'))
         
+    phone_id = request.args.get('id', type=int)
     conn = get_db_connection()
     phone = conn.execute('SELECT * FROM phones WHERE id = ?', (phone_id,)).fetchone()
     conn.close()
@@ -186,6 +188,3 @@ def admin_panel():
             conn.execute('DELETE FROM phones WHERE id = ?', (delete_id,))
             conn.commit()
             flash("Listing removed.", "info")
-        return redirect(url_for('admin_panel'))
-        
-    all_phones = conn.execute('SELECT * FROM phones ORDER BY id DESC').fetchall()
