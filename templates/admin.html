@@ -28,6 +28,7 @@
         </div>
 
         <div class="grid-split">
+            <!-- Left Panel: Create Inventory Block -->
             <div>
                 <h3>Add New Product</h3>
                 <form method="POST">
@@ -44,11 +45,13 @@
                         <label>Hardware Description Specs</label>
                         <textarea name="description" rows="3" placeholder="RAM, Storage details..." required></textarea>
                     </div>
+                    <!-- Hidden field inputs matched exactly to clear database schema parameters conflicts -->
                     <input type="hidden" name="image" value="vector_css">
                     <button type="submit" class="btn">Save Product to Database</button>
                 </form>
             </div>
 
+            <!-- Right Panel: View and Purge Active Stock -->
             <div>
                 <h3>Active Store Stock Inventory</h3>
                 <table>
