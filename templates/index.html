@@ -78,7 +78,8 @@
 
         <div class="phone-grid" id="catalogGrid">
             {% for product in products %}
-            <div class="phone-card" data-phone-name="{{ product.name|lower }}" data-phone-desc="{{ product.description|lower }}" data-brand="{% if 'Samsung' in product.name %}samsung{% elif 'Tecno' in product.name %}tecno{% elif 'itel' in product.name %}itel{% else %}premium{% endif %}">
+            <!-- FIXED: Pulls pre-sanitized attributes straight from SQLite schema safely -->
+            <div class="phone-card" data-phone-name="{{ product.search_name }}" data-phone-desc="{{ product.search_desc }}" data-brand="{{ product.brand_tag }}">
                 <div class="phone-container 
                     {% if 'Ultra' in product.name %}samsung-ultra-bg
                     {% elif 'Samsung' in product.name %}samsung-a-bg
@@ -127,8 +128,13 @@
             let searchQuery = document.getElementById('storeSearch').value.toLowerCase().trim();
             let productCards = document.getElementsByClassName('phone-card');
             for (let card of productCards) {
-                let matchSearch = card.getAttribute('data-phone-name').includes(searchQuery) || card.getAttribute('data-phone-desc').includes(searchQuery);
-                let matchBrand = (currentActiveBrand === 'all') || (card.getAttribute('data-brand') === currentActiveBrand);
+                let nameAttr = card.getAttribute('data-phone-name') || '';
+                let descAttr = card.getAttribute('data-phone-desc') || '';
+                let brandAttr = card.getAttribute('data-brand') || '';
+
+                let matchSearch = nameAttr.includes(searchQuery) || descAttr.includes(searchQuery);
+                let matchBrand = (currentActiveBrand === 'all') || (brandAttr === currentActiveBrand);
+
                 card.style.display = (matchSearch && matchBrand) ? "flex" : "none";
             }
         }
@@ -146,6 +152,3 @@
             const targetTheme = currentTheme === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', targetTheme);
             localStorage.setItem('phoneStoreTheme', targetTheme);
-            document.getElementById('themeSwitcher').innerText = targetTheme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
-        }
-
