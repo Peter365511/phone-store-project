@@ -3,158 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kenya Phone Hub Store</title>
+    <title>Xiaomi Store Kenya - Premium Catalog</title>
     <style>
-        :root { --bg-primary: #f4f6f9; --bg-card: #ffffff; --text-main: #333333; --text-muted: #7f8c8d; --border-color: #eef2f5; }
-        [data-theme="dark"] { --bg-primary: #0f172a; --bg-card: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8; --border-color: #334155; }
+        /* Modern Premium Design Tokens */
+        :root { 
+            --bg-primary: #f9fafb; 
+            --bg-card: #ffffff; 
+            --text-main: #0f172a; 
+            --text-muted: #475569; 
+            --brand-primary: #FF6700; /* Signature Brand Orange */
+            --brand-hover: #E05300;
+            --border-color: #f1f5f9;
+            --shadow-sm: 0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -1px rgba(0,0,0,0.02);
+            --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.04), 0 10px 10px -5px rgba(0,0,0,0.02);
+        }
+        [data-theme="dark"] { 
+            --bg-primary: #090d16; 
+            --bg-card: #131c2e; 
+            --text-main: #f8fafc; 
+            --text-muted: #94a3b8; 
+            --border-color: #1e293b; 
+            --shadow-sm: 0 4px 6px -1px rgba(0,0,0,0.2);
+            --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.3);
+        }
 
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg-primary); margin: 0; padding: 0; color: var(--text-main); transition: background 0.2s, color 0.2s; }
-        .header { background: #1a252f; color: white; padding: 35px 20px; text-align: center; position: relative; }
-        .nav-links { position: absolute; top: 25px; right: 20px; display: flex; align-items: center; gap: 10px; }
-        .nav-links a, .theme-toggle-btn { color: white; text-decoration: none; font-weight: bold; background: rgba(255,255,255,0.15); padding: 7px 16px; border-radius: 6px; font-size: 0.9rem; border: none; cursor: pointer; }
-        .theme-toggle-btn { background: #f39c12; }
+        body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; background-color: var(--bg-primary); margin: 0; padding: 0; color: var(--text-main); transition: background 0.3s, color 0.3s; }
+        
+        /* 📱 Top Premium Navigation Bar Component */
+        .navbar { background: var(--bg-card); border-bottom: 1px solid var(--border-color); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm); sticky: top; z-index: 100; }
+        .nav-brand { display: flex; align-items: center; gap: 12px; }
+        .logo-box { background: var(--brand-primary); color: white; font-weight: 800; font-size: 1.2rem; padding: 6px 12px; border-radius: 8px; letter-spacing: 0.5px; }
+        .brand-title { font-weight: 700; font-size: 1.15rem; color: var(--text-main); letter-spacing: -0.5px; }
+        .nav-links { display: flex; align-items: center; gap: 15px; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; font-weight: 600; font-size: 0.9rem; padding: 8px 16px; border-radius: 8px; transition: all 0.2s; }
+        .nav-links a:hover { background: var(--bg-primary); color: var(--text-main); }
+        .theme-toggle-btn { background: #64748b; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.85rem; transition: background 0.2s; }
+        .theme-toggle-btn:hover { background: #475569; }
 
-        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-        .filter-section { background: var(--bg-card); padding: 20px; border-radius: 12px; margin-bottom: 30px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; border: 1px solid var(--border-color); }
-        .search-input { flex: 1; min-width: 250px; padding: 12px 18px; border: 2px solid var(--border-color); background: var(--bg-primary); color: var(--text-main); border-radius: 8px; font-size: 1rem; outline: none; }
-        
-        .filter-buttons { display: flex; gap: 10px; }
-        .filter-btn { background: rgba(148,163,184,0.1); color: var(--text-main); border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; }
-        .filter-btn.active { background: #2980b9; color: white; }
+        /* 🍊 Dynamic Hero Commercial Showcase Banner Section */
+        .hero-banner { background: linear-gradient(135deg, rgba(255,103,0,0.04) 0%, rgba(255,103,0,0) 100%); padding: 60px 40px; text-align: center; border-bottom: 1px solid var(--border-color); margin-bottom: 40px; position: relative; }
+        .hero-tag { display: inline-block; color: var(--brand-primary); font-weight: 800; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; }
+        .hero-main-title { font-size: 2.8rem; font-weight: 800; margin: 0 0 15px 0; color: var(--text-main); letter-spacing: -1px; line-height: 1.2; }
+        .hero-main-title span { color: var(--brand-primary); }
+        .hero-sub { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto; line-height: 1.6; }
 
-        .phone-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
-        .phone-card { background: var(--bg-card); border-radius: 16px; overflow: hidden; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--border-color); }
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 40px 60px 40px; }
         
-        .phone-container { width: 100%; height: 210px; border-radius: 12px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; box-shadow: inset 0 0 50px rgba(0,0,0,0.2); }
-        .samsung-ultra-bg { background: linear-gradient(145deg, #2c3e50, #0f171e); } 
-        .samsung-a-bg { background: linear-gradient(145deg, #1e3c72, #2a5298); } 
-        .tecno-bg { background: linear-gradient(145deg, #4a00e0, #8e2de2); } 
-        .itel-bg { background: linear-gradient(145deg, #d31027, #ea00d9); } 
-        .premium-bg { background: linear-gradient(145deg, #111111, #434343); } 
+        /* 🔍 Search Input & Category Filters Bar */
+        .filter-section { background: var(--bg-card); padding: 16px; border-radius: 14px; box-shadow: var(--shadow-sm); margin-bottom: 40px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; border: 1px solid var(--border-color); }
+        .search-input { flex: 1; min-width: 280px; padding: 12px 20px; border: 2px solid var(--border-color); background: var(--bg-primary); color: var(--text-main); border-radius: 10px; font-size: 0.95rem; outline: none; transition: border-color 0.2s; }
+        .search-input:focus { border-color: var(--brand-primary); }
         
-        .phone-inner-screen { width: 88%; height: 92%; border-radius: 8px; border: 2px solid rgba(255,255,255,0.18); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; background: rgba(255,255,255,0.05); }
-        .camera-lens { width: 22px; height: 22px; background: rgba(255,255,255,0.1); border-radius: 50%; position: absolute; top: 22px; border: 1px solid rgba(255,255,255,0.4); }
+        .filter-buttons { display: flex; gap: 8px; }
+        .filter-btn { background: var(--bg-primary); color: var(--text-muted); border: 1px solid var(--border-color); padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; }
+        .filter-btn:hover, .filter-btn.active { background: var(--brand-primary); color: white; border-color: var(--brand-primary); box-shadow: 0 4px 12px rgba(255,103,0,0.25); }
+
+        /* 🏬 High-End Interactive Catalog Grid Layout */
+        .phone-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 35px; }
+        .phone-card { background: var(--bg-card); border-radius: 20px; overflow: hidden; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s; position: relative; }
+        .phone-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-lg); border-color: rgba(255,103,0,0.15); }
         
-        .brand-badge { display: inline-block; font-size: 0.75rem; padding: 5px 12px; border-radius: 30px; text-transform: uppercase; font-weight: bold; margin-top: 15px; }
-        .badge-samsung { background: #e3f2fd; color: #0d47a1; }
-        .badge-tecno { background: #f3e5f5; color: #4a148c; }
-        .badge-itel { background: #ffebee; color: #b71c1c; }
-        .badge-premium { background: #eceff1; color: #263238; }
+        /* Premium Floating Availability Badge */
+        .stock-badge { position: absolute; top: 20px; right: 24px; background: #e6f7ed; color: #15803d; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 5px; }
+        .stock-badge::before { content: ''; width: 6px; height: 6px; background: #22c55e; border-radius: 50%; display: inline-block; }
+
+        /* Hardware Device Presentation Mockup */
+        .phone-container { width: 100%; height: 180px; border-radius: 14px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; margin-bottom: 20px; }
+        .samsung-ultra-bg { background: linear-gradient(135deg, #1e293b, #0f172a); } 
+        .samsung-a-bg { background: linear-gradient(135deg, #2563eb, #1d4ed8); } 
+        .tecno-bg { background: linear-gradient(135deg, #7c3aed, #6d28d9); } 
+        .itel-bg { background: linear-gradient(135deg, #dc2626, #b91c1c); } 
+        .premium-bg { background: linear-gradient(135deg, #4b5563, #374151); } 
         
-        .phone-title { margin: 12px 0 6px 0; color: var(--text-main); font-size: 1.25rem; font-weight: 700; }
-        .phone-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 18px; min-height: 45px; line-height: 1.4; }
-        .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 10px; border-top: 1px solid var(--border-color); }
-        .price-tag { font-size: 1.3rem; font-weight: bold; color: #27ae60; }
-        .buy-btn { background: #2980b9; color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 0.9rem; }
+        .phone-inner-screen { width: 85%; height: 90%; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; background: rgba(255,255,255,0.03); backdrop-filter: blur(4px); }
+        .device-icon-label { font-size: 1.15rem; letter-spacing: 2px; font-weight: 800; opacity: 0.95; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        
+        .brand-text-label { font-size: 0.75rem; color: var(--brand-primary); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .phone-title { margin: 0 0 15px 0; color: var(--text-main); font-size: 1.35rem; font-weight: 800; letter-spacing: -0.5px; }
+        
+        /* 📊 Technical Specification Badge Data Rows (Matching Reference Image) */
+        .specs-table { border-top: 1px solid var(--border-color); margin-bottom: 20px; padding-top: 10px; }
+        .specs-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.85rem; border-bottom: 1px dashed var(--border-color); }
+        .specs-label { color: var(--text-muted); font-weight: 500; display: flex; align-items: center; gap: 6px; }
+        .specs-val { color: var(--text-main); font-weight: 600; }
+
+        /* Pricing and Action footer modules */
+        .card-footer-box { display: flex; flex-direction: column; gap: 12px; margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); }
+        .price-section { display: flex; align-items: baseline; gap: 8px; }
+        .price-tag { font-size: 1.6rem; font-weight: 800; color: var(--brand-primary); }
+        .price-original { font-size: 0.9rem; color: var(--text-muted); text-decoration: line-through; opacity: 0.6; }
+        
+        .buy-btn { background: var(--brand-primary); color: white; text-align: center; padding: 12px 20px; text-decoration: none; border-radius: 12px; font-weight: 700; font-size: 0.95rem; transition: background 0.2s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(255,103,0,0.15); display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .buy-btn:hover { background: var(--brand-hover); box-shadow: 0 6px 16px rgba(255,103,0,0.3); }
     </style>
 </head>
 <body>
 
-    <div class="header">
+    <!-- Premium Navigation Menu Strip -->
+    <div class="navbar">
+        <div class="nav-brand">
+            <div class="logo-box">mi</div>
+            <div class="brand-title">Xiaomi Store Kenya</div>
+        </div>
         <div class="nav-links">
             <button class="theme-toggle-btn" id="themeSwitcher" onclick="toggleDisplayTheme()">🌙 Dark Mode</button>
-            <a href="/">Home</a>
+            <a href="/">Home Catalog</a>
             {% if session.get('user') %}
                 <a href="/orders">My Orders</a>
                 <a href="/logout">Logout</a>
             {% else %}
-                <a href="/login">Login / Register</a>
+                <a href="/login">Sign In / Register</a>
             {% endif %}
         </div>
-        <h1>🇰🇪 Kenya Phone Hub</h1>
-        <p>Premium Smartphone Store — Powered by M-Pesa Express</p>
+    </div>
+
+    <!-- Commercial Showcase Header Hero Module -->
+    <div class="hero-banner">
+        <span class="hero-tag">Xiaomi Store Kenya Premium Showcase</span>
+        <h1 class="hero-main-title">Find your everyday <span>upgrade.</span></h1>
+        <p class="hero-sub">Explore curated collections of smartphones, smart home utilities, and ecosystem variants with secure, instant M-Pesa checkpoints.</p>
     </div>
 
     <div class="container">
+        <!-- Interactive Real-time Search Infrastructure -->
         <div class="filter-section">
-            <input type="text" id="storeSearch" class="search-input" placeholder="Search by model name or specifications..." oninput="filterStoreCatalog()">
+            <input type="text" id="storeSearch" class="search-input" placeholder="Search parameters (e.g., 512GB, Camon, S25)..." oninput="filterStoreCatalog()">
             <div class="filter-buttons">
-                <button class="filter-btn active" onclick="filterBrandCategory('all', this)">All Brands</button>
-                <button class="filter-btn" onclick="filterBrandCategory('samsung', this)">Samsung</button>
-                <button class="filter-btn" onclick="filterBrandCategory('tecno', this)">Tecno</button>
-                <button class="filter-btn" onclick="filterBrandCategory('itel', this)">itel</button>
-            </div>
-        </div>
-
-        <div class="phone-grid" id="catalogGrid">
-            {% for product in products %}
-            <div class="phone-card" data-phone-name="{{ product.search_name }}" data-phone-desc="{{ product.search_desc }}" data-brand="{{ product.brand_tag }}">
-                <div class="phone-container 
-                    {% if 'Ultra' in product.name %}samsung-ultra-bg
-                    {% elif 'Samsung' in product.name %}samsung-a-bg
-                    {% elif 'Tecno' in product.name %}tecno-bg
-                    {% elif 'itel' in product.name %}itel-bg
-                    {% else %}premium-bg{% endif %}">
-                    <div class="camera-lens"></div>
-                    <div class="phone-inner-screen">
-                        <span style="font-size: 1.2rem; letter-spacing: 2px; font-weight: 800;">
-                            {% if 'Samsung' in product.name %}SAMSUNG
-                            {% elif 'Tecno' in product.name %}TECNO
-                            {% elif 'itel' in product.name %}ITEL
-                            {% else %}PREMIUM{% endif %}
-                        </span>
-                    </div>
-                </div>
-                
-                <div>
-                    <span class="brand-badge 
-                        {% if 'Samsung' in product.name %}badge-samsung
-                        {% elif 'Tecno' in product.name %}badge-tecno
-                        {% elif 'itel' in product.name %}badge-itel
-                        {% else %}badge-premium{% endif %}">
-                        {% if 'Samsung' in product.name %}Samsung Hardware
-                        {% elif 'Tecno' in product.name %}Tecno Mobile
-                        {% elif 'itel' in product.name %}itel Value
-                        {% else %}Premium Flagship{% endif %}
-                    </span>
-                    <h3 class="phone-title">{{ product.name }}</h3>
-                    <p class="phone-desc">{{ product.description }}</p>
-                </div>
-                
-                <div class="card-footer">
-                    <span class="price-tag">KSh {{ "{:,}".format(product.price) }}</span>
-                    <!-- FIXED: Aligned template queries securely to route query links elegantly -->
-                    <a href="/pay?id={{ product.id }}" class="buy-btn">Buy via M-Pesa</a>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    <!-- PURE INDEPENDENT RUNTIME INLINE SCRIPT EXECUTION BLOCKS -->
-    <script>
-        let currentActiveBrand = "all";
-
-        function filterStoreCatalog() {
-            let searchQuery = document.getElementById("storeSearch").value.toLowerCase().trim();
-            let productCards = document.getElementsByClassName("phone-card");
-            
-            for (let i = 0; i < productCards.length; i++) {
-                let card = productCards[i];
-                let nameAttr = card.getAttribute("data-phone-name") || "";
-                let descAttr = card.getAttribute("data-phone-desc") || "";
-                let brandAttr = card.getAttribute("data-brand") || "";
-
-                let matchSearch = nameAttr.indexOf(searchQuery) > -1 || descAttr.indexOf(searchQuery) > -1;
-                let matchBrand = currentActiveBrand === "all" || brandAttr === currentActiveBrand;
-
-                if (matchSearch && matchBrand) {
-                    card.style.setAttribute ? card.style.setAttribute("display", "flex") : card.style.display = "flex";
-                } else {
-                    card.style.setAttribute ? card.style.setAttribute("display", "none") : card.style.display = "none";
-                }
-            }
-        }
-
-        function filterBrandCategory(brandName, clickedButton) {
-            let buttons = document.getElementsByClassName("filter-btn");
-            for (let i = 0; i < buttons.length; i++) {
-                buttons[i].className = "filter-btn";
-            }
-            clickedButton.className = "filter-btn active";
-            currentActiveBrand = brandName;
-            filterStoreCatalog();
-        }
-
-        function toggleDisplayTheme() {
-            let rootNode = document.documentElement;
