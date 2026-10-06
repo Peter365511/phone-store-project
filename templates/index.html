@@ -10,7 +10,7 @@
             --bg-card: #ffffff; 
             --text-main: #0f172a; 
             --text-muted: #475569; 
-            --brand-primary: #FF6700; /* Signature Accent Orange */
+            --brand-primary: #FF6700;
             --brand-hover: #E05300;
             --border-color: #f1f5f9;
             --shadow-sm: 0 4px 6px -1px rgba(0,0,0,0.02);
@@ -137,4 +137,5 @@
                     <div class="camera-lens"></div>
                     <div class="phone-inner-screen">
                         <div class="device-icon-label">
-                            <!-- FIXED: Corrected multi-brand parsing statements to seal syntax exceptions completely -->
+                            {% if 'Samsung' in product.name %}SAMSUNG
+                            {% elif 'Tecno' in product.name %}TECNO
