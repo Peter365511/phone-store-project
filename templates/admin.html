@@ -1,113 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard Portal - Phone Store Kenya</title>
-    <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f1f3f6; margin: 0; padding: 20px; }
-        .admin-box { max-width: 1100px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2, h3 { color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; }
-        .grid-split { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; margin-top: 20px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; color: #34495e; }
-        input, textarea { width: 100%; padding: 10px; border: 1px solid #bdc3c7; border-radius: 6px; box-sizing: border-box; }
-        .btn { background: #FF6700; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
-        th { background-color: #34495e; color: white; }
-        .delete-btn { background: #e74c3c; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; }
-    </style>
-</head>
-<body>
-
-    <div class="admin-box">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2>🛠️ Phone Store Kenya Management Panel</h2>
-            <a href="/" style="background: #34495e; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-weight: bold;">View Live Shop</a>
-        </div>
-
-        <div class="grid-split">
-            <!-- Left Panel: Create Inventory Block -->
-            <div>
-                <h3>Add New Product</h3>
-                <form method="POST">
-                    <input type="hidden" name="add_phone" value="1">
-                    <div class="form-group">
-                        <label>Device Full Name</label>
-                        <input type="text" name="name" placeholder="e.g., Tecno Camon 30 Pro" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Price (KSh)</label>
-                        <input type="number" name="price" placeholder="e.g., 48000" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Hardware Description Specs</label>
-                        <textarea name="description" rows="3" placeholder="RAM, Storage details..." required></textarea>
-                    </div>
-                    <!-- Hidden field inputs matched exactly to clear database schema parameters conflicts -->
-                    <input type="hidden" name="image" value="vector_css">
-                    <button type="submit" class="btn">Save Product to Database</button>
-                </form>
-            </div>
-
-            <!-- Right Panel: View and Purge Active Stock -->
-            <div>
-                <h3>Active Store Stock Inventory</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Price</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for phone in phones %}
-                        <tr>
-                            <td>#{{ phone.id }}</td>
-                            <td><strong>{{ phone.name }}</strong></td>
-                            <td>KSh {{ "{:,}".format(phone.price) }}</td>
-                            <td>
-                                <form method="POST" style="display:inline;">
-                                    <input type="hidden" name="delete_id" value="{{ phone.id }}">
-                                    <button type="submit" class="delete-btn">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div style="margin-top: 40px;">
-            <h3>🛒 Safaricom M-Pesa Incoming Order Log Stream</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Customer</th>
-                        <th>Device Name</th>
-                        <th>Amount Paid</th>
-                        <th>M-Pesa Number</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for order in orders %}
-                    <tr>
-                        <td>ORD-{{ "%05d"|format(order.id) }}</td>
-                        <td>{{ order.username }}</td>
-                        <td>{{ order.item_name }}</td>
-                        <td style="color: #27ae60; font-weight: bold;">KSh {{ "{:,}".format(order.amount) }}</td>
-                        <td>{{ order.phone_number }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<html>
+<body style="font-family:sans-serif; background:#f1f3f6; padding:20px;">
+    <div style="max-width:1000px; margin:0 auto; background:white; padding:30px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.05);">
+        <h2>🛠️ Phone Store Kenya Admin Panel</h2>
+        <form method="POST" style="max-width:400px; margin-bottom:30px;">
+            <input type="hidden" name="add_phone" value="1">
+            <input type="text" name="name" placeholder="Device Full Name" required style="width:100%; padding:10px; margin-bottom:10px;"><br>
+            <input type="number" name="price" placeholder="Price (KSh)" required style="width:100%; padding:10px; margin-bottom:10px;"><br>
+            <textarea name="description" placeholder="Specs details" required style="width:100%; padding:10px; margin-bottom:10px;"></textarea><br>
+            <input type="hidden" name="image" value="vector_css">
+            <button type="submit" style="background:#FF6700; color:white; border:none; padding:10px; width:100%; font-weight:700; cursor:pointer;">Save Product</button>
+        </form>
+        <h3>Active Stock</h3>
+        <table style="width:100%; border-collapse:collapse;">
+            {% for phone in phones %}
+            <tr style="border-bottom:1px solid #ddd; padding:10px 0;"><td>#{{ phone.id }}</td><td><strong>{{ phone.name }}</strong></td><td>KSh {{ "{:,}".format(phone.price) }}</td></tr>
+            {% endfor %}
+        </table>
     </div>
-
 </body>
 </html>
