@@ -3,12 +3,18 @@ import sqlite3
 import os
 from datetime import datetime
 
-app = Flask(__name__)
+# 🧩 DYNAMIC PATH CALCULATION MECHANISM
+# This forces Flask to locate your templates regardless of Linux folder case restrictions
+base_dir = os.path.abspath(os.path.dirname(__file__))
+template_dir = os.path.join(base_dir, 'templates')
+
+app = Flask(__name__, template_folder=template_dir)
 app.secret_key = 'kenya_phone_store_secret_key'
 
 def get_db_connection():
-    # store_v60 resets the platform caching layers to enforce the brand name change instantly
-    conn = sqlite3.connect('store_v60.db')
+    # Bumping to store_v90 completely destroys old corrupted database caches on Render
+    db_path = os.path.join(base_dir, 'store_v90.db')
+    conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -93,7 +99,6 @@ def login():
         conn.close()
         if user:
             session['user'] = user['username']
-            flash(f"Welcome back, {user['username']}!", "success")
             if user['username'] == 'admin':
                 return redirect(url_for('admin_panel'))
             return redirect(url_for('home'))
@@ -110,7 +115,6 @@ def register():
         try:
             conn.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, password))
             conn.commit()
-            flash("Registration successful! Please log in.", "success")
             return redirect(url_for('login'))
         except sqlite3.IntegrityError:
             flash("Username already exists!", "danger")
@@ -121,13 +125,11 @@ def register():
 @app.route('/logout')
 def logout():
     session.pop('user', None)
-    flash("You have logged out.", "info")
     return redirect(url_for('home'))
 
 @app.route('/pay', methods=['GET', 'POST'])
 def pay():
     if 'user' not in session:
-        flash("Please log in to purchase products!", "danger")
         return redirect(url_for('login'))
         
     phone_id = request.args.get('id', type=int)
@@ -147,8 +149,6 @@ def pay():
         ''', (session['user'], phone['name'], phone['price'], phone_number, 'Pending API M-Pesa Verification', timestamp))
         conn.commit()
         conn.close()
-        
-        flash(f"M-Pesa STK push request pushed out to {phone_number} successfully!", "success")
         return redirect(url_for('orders'))
     return render_template('pay.html', phone=phone)
 
@@ -164,7 +164,6 @@ def orders():
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_panel():
     if session.get('user') != 'admin':
-        flash("Unauthorized Access!", "danger")
         return redirect(url_for('login'))
         
     conn = get_db_connection()
@@ -181,11 +180,14 @@ def admin_panel():
             conn.execute('INSERT INTO phones (name, price, description, image, search_name, search_desc, brand_tag) VALUES (?, ?, ?, ?, ?, ?, ?)', 
                          (name, price, description, image, s_name, s_desc, b_tag))
             conn.commit()
-            flash(f"Successfully added {name}!", "success")
         elif 'delete_id' in request.form:
             delete_id = request.form.get('delete_id')
             conn.execute('DELETE FROM phones WHERE id = ?', (delete_id,))
             conn.commit()
-            flash("Listing removed.", "info")
         return redirect(url_for('admin_panel'))
         
+    all_phones = conn.execute('SELECT * FROM phones ORDER BY id DESC').fetchall()
+    all_orders = conn.execute('SELECT * FROM orders ORDER BY id DESC').fetchall()
+    conn.close()
+    return render_template('admin.html', phones=all_phones, orders=all_orders)
+
