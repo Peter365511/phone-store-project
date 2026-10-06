@@ -3,39 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In | PhoneStore</title>
-    <script src="https://tailwindcss.com"></script>
+    <title>Account Access - Phone Store Kenya</title>
+    <style>
+        :root {
+            --bg-primary: #f9fafb;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --brand-primary: #FF6700;
+            --border-color: #f1f5f9;
+        }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg-primary); color: var(--text-main); margin: 0; padding: 20px; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .login-box { max-width: 420px; width: 100%; background: var(--bg-card); padding: 35px; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); border: 1px solid var(--border-color); text-align: center; }
+        .logo-head { background: var(--brand-primary); color: white; display: inline-block; font-weight: 800; font-size: 1.4rem; padding: 8px 16px; border-radius: 10px; margin-bottom: 20px; }
+        h2 { margin: 0 0 25px 0; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px; }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-muted); font-size: 0.85rem; }
+        input { width: 100%; padding: 12px 16px; border: 2px solid var(--border-color); border-radius: 10px; box-sizing: border-box; outline: none; font-size: 0.95rem; }
+        input:focus { border-color: var(--brand-primary); }
+        .btn { background: var(--brand-primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; width: 100%; margin-top: 10px; transition: background 0.2s; }
+        .btn:hover { background: #e05300; }
+        .register-footer { margin-top: 20px; font-size: 0.9rem; color: var(--text-muted); }
+        .register-footer a { color: var(--brand-primary); text-decoration: none; font-weight: 700; }
+    </style>
 </head>
-<body class="bg-slate-50 font-sans min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+<body>
 
-    <div class="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <a href="/" class="text-2xl font-black tracking-tight text-slate-900">
-            <span class="text-emerald-500">🇰🇪</span> PhoneStore
-        </a>
-        <h2 class="mt-6 text-3xl font-black tracking-tight text-slate-900">Sign in to your account</h2>
-    </div>
-
-    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4">
-        <div class="bg-white py-8 px-4 border border-slate-200/80 rounded-2xl shadow-xl sm:px-10">
-            <form class="space-y-6" method="POST">
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700">Username</label>
-                    <input type="text" name="username" placeholder="e.g. admin" required class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700">Password</label>
-                    <input type="password" name="password" placeholder="e.g. 1234" required class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                </div>
-                <button type="submit" class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-slate-950 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200">
-                    Sign In
-                </button>
-            </form>
-            
-            <div class="mt-6 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between text-sm gap-2">
-                <a href="/register" class="font-bold text-emerald-600 hover:text-emerald-500 transition">Create a new account</a>
-                <a href="/" class="font-medium text-slate-500 hover:text-slate-800 transition">← Back to Shop</a>
+    <div class="login-box">
+        <div class="logo-head">🇰🇪</div>
+        <h2>Sign In to Phone Store Kenya</h2>
+        
+        <form method="POST">
+            <div class="form-group">
+                <label>Account Username</label>
+                <input type="text" name="username" placeholder="Enter username (Use 'admin' for metrics panel)" required>
             </div>
+            <div class="form-group">
+                <label>Secure Password</label>
+                <input type="password" name="password" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn">Authenticate Securely</button>
+        </form>
+        
+        <div class="register-footer">
+            New customer? <a href="/register">Create an account here</a>
         </div>
+        <a href="/" style="display:block; margin-top:15px; color: var(--text-muted); text-decoration:none; font-size:0.85rem; font-weight:600;">← Back to Storefront</a>
     </div>
 
 </body>
