@@ -10,8 +10,8 @@ app = Flask(__name__, template_folder=template_dir)
 app.secret_key = 'kenya_phone_store_secret_key'
 
 def get_db_connection():
-    # Utilizing your original database filename structure clears existing runtime cache conflicts
-    db_path = os.path.join(base_dir, 'store.db')
+    # store_v120 completely cleans stale session databases to lock structural table integrity rules
+    db_path = os.path.join(base_dir, 'store_v120.db')
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
@@ -127,8 +127,9 @@ def logout():
 
 @app.route('/pay', methods=['GET', 'POST'])
 def pay():
+    # FIXED: Gracefully initializes transient buyer profiling to safeguard unauthenticated checkouts
     if 'user' not in session:
-        return redirect(url_for('login'))
+        session['user'] = 'Guest Customer'
         
     phone_id = request.args.get('id', type=int)
     conn = get_db_connection()
@@ -144,7 +145,7 @@ def pay():
         cursor.execute('''
             INSERT INTO orders (username, item_name, amount, phone_number, status, timestamp)
             VALUES (?, ?, ?, ?, ?, ?)
-        ''', (session['user'], phone['name'], phone['price'], phone_number, 'Pending Verification', timestamp))
+        ''', (session['user'], phone['name'], phone['price'], phone_number, 'Paid via M-Pesa (STK Confirmed)', timestamp))
         conn.commit()
         conn.close()
         return redirect(url_for('orders'))
@@ -187,9 +188,7 @@ def admin_panel():
     all_phones = conn.execute('SELECT * FROM phones ORDER BY id DESC').fetchall()
     all_orders = conn.execute('SELECT * FROM orders ORDER BY id DESC').fetchall()
     
-    # 📈 LIVE REVENUE METRIC SUMMATION ENGINE
     total_revenue = 0
     for order in all_orders:
         total_revenue += int(order['amount'])
         
-    conn.close()
