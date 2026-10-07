@@ -3,8 +3,6 @@ import sqlite3
 import os
 from datetime import datetime
 
-# 🧩 DYNAMIC PATH CALCULATION MECHANISM
-# This forces Flask to locate your templates regardless of Linux folder case restrictions
 base_dir = os.path.abspath(os.path.dirname(__file__))
 template_dir = os.path.join(base_dir, 'templates')
 
@@ -12,8 +10,8 @@ app = Flask(__name__, template_folder=template_dir)
 app.secret_key = 'kenya_phone_store_secret_key'
 
 def get_db_connection():
-    # Bumping to store_v90 completely destroys old corrupted database caches on Render
-    db_path = os.path.join(base_dir, 'store_v90.db')
+    # Bumping to version 100 completely drops any old corrupted database files on Render
+    db_path = os.path.join(base_dir, 'store_v100.db')
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
@@ -191,3 +189,5 @@ def admin_panel():
     conn.close()
     return render_template('admin.html', phones=all_phones, orders=all_orders)
 
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
