@@ -10,8 +10,7 @@ app = Flask(__name__, template_folder=template_dir)
 app.secret_key = 'kenya_phone_store_secret_key'
 
 def get_db_connection():
-    # store_v120 completely cleans stale session databases to lock structural table integrity rules
-    db_path = os.path.join(base_dir, 'store_v120.db')
+    db_path = os.path.join(base_dir, 'store_v150.db')
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
@@ -127,7 +126,6 @@ def logout():
 
 @app.route('/pay', methods=['GET', 'POST'])
 def pay():
-    # FIXED: Gracefully initializes transient buyer profiling to safeguard unauthenticated checkouts
     if 'user' not in session:
         session['user'] = 'Guest Customer'
         
@@ -151,15 +149,18 @@ def pay():
         return redirect(url_for('orders'))
     return render_template('pay.html', phone=phone)
 
+# 👤 3. CUSTOM USER PROFILE TRANSACTION HISTORY ROUTE
 @app.route('/orders')
 def orders():
     if 'user' not in session:
         return redirect(url_for('login'))
     conn = get_db_connection()
+    # Pulls orders belonging ONLY to the logged-in customer profile
     user_orders = conn.execute('SELECT * FROM orders WHERE username = ? ORDER BY id DESC', (session['user'],)).fetchall()
     conn.close()
     return render_template('orders.html', orders=user_orders)
 
+# 📊 2. ADMIN PANEL REVENUE CALCULATION DASHBOARD ROUTE
 @app.route('/admin', methods=['GET', 'POST'])
 def admin_panel():
     if session.get('user') != 'admin':
@@ -188,7 +189,7 @@ def admin_panel():
     all_phones = conn.execute('SELECT * FROM phones ORDER BY id DESC').fetchall()
     all_orders = conn.execute('SELECT * FROM orders ORDER BY id DESC').fetchall()
     
+    # Dynamic Revenue Aggregator
     total_revenue = 0
     for order in all_orders:
         total_revenue += int(order['amount'])
-        
