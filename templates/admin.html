@@ -1,22 +1,49 @@
 <!DOCTYPE html>
-<html>
-<body style="font-family:sans-serif; background:#f1f3f6; padding:20px;">
-    <div style="max-width:1000px; margin:0 auto; background:white; padding:30px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.05);">
-        <h2>🛠️ Phone Store Kenya Admin Panel</h2>
-        <form method="POST" style="max-width:400px; margin-bottom:30px;">
-            <input type="hidden" name="add_phone" value="1">
-            <input type="text" name="name" placeholder="Device Full Name" required style="width:100%; padding:10px; margin-bottom:10px;"><br>
-            <input type="number" name="price" placeholder="Price (KSh)" required style="width:100%; padding:10px; margin-bottom:10px;"><br>
-            <textarea name="description" placeholder="Specs details" required style="width:100%; padding:10px; margin-bottom:10px;"></textarea><br>
-            <input type="hidden" name="image" value="vector_css">
-            <button type="submit" style="background:#FF6700; color:white; border:none; padding:10px; width:100%; font-weight:700; cursor:pointer;">Save Product</button>
-        </form>
-        <h3>Active Stock</h3>
-        <table style="width:100%; border-collapse:collapse;">
-            {% for phone in phones %}
-            <tr style="border-bottom:1px solid #ddd; padding:10px 0;"><td>#{{ phone.id }}</td><td><strong>{{ phone.name }}</strong></td><td>KSh {{ "{:,}".format(phone.price) }}</td></tr>
-            {% endfor %}
-        </table>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard Portal - Phone Store Kenya</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f1f3f6; margin: 0; padding: 20px; }
+        .admin-box { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .grid-split { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; margin-top: 20px; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #bdc3c7; border-radius: 6px; box-sizing: border-box; margin-bottom: 10px; }
+        .btn { background: #FF6700; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
+        th { background-color: #34495e; color: white; }
+    </style>
+</head>
+<body>
+    <div class="admin-box">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>🛠️ Phone Store Kenya Management Panel</h2>
+            <a href="/" style="background: #34495e; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-weight: bold;">View Live Shop</a>
+        </div>
+        <div class="grid-split">
+            <div>
+                <h3>Add New Product</h3>
+                <form method="POST">
+                    <input type="hidden" name="add_phone" value="1">
+                    <input type="text" name="name" placeholder="Device Full Name" required>
+                    <input type="number" name="price" placeholder="Price (KSh)" required>
+                    <textarea name="description" rows="3" placeholder="Specs details..." required></textarea>
+                    <input type="hidden" name="image" value="vector_css">
+                    <button type="submit" class="btn">Save Product</button>
+                </form>
+            </div>
+            <div>
+                <h3>Active Store Stock Inventory</h3>
+                <table>
+                    <thead><tr><th>ID</th><th>Name</th><th>Price</th></tr></thead>
+                    <tbody>
+                        {% for phone in phones %}
+                        <tr><td>#{{ phone.id }}</td><td><strong>{{ phone.name }}</strong></td><td>KSh {{ "{:,}".format(phone.price) }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </body>
 </html>
