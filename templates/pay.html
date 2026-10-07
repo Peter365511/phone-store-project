@@ -1,33 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M-Pesa Secure Checkout - Phone Store Kenya</title>
-    <style>
-        :root { --bg-primary: #f9fafb; --bg-card: #ffffff; --text-main: #0f172a; --brand-primary: #FF6700; --border-color: #f1f5f9; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: var(--bg-primary); color: var(--text-main); margin: 0; padding: 20px; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-        .checkout-box { max-width: 450px; width: 100%; background: var(--bg-card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid var(--border-color); text-align: center; }
-        .item-details { background: var(--bg-primary); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border-color); text-align: left; }
-        .price-display { font-size: 1.6rem; font-weight: 800; color: var(--brand-primary); margin-top: 10px; }
-        input { width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 10px; box-sizing: border-box; outline: none; margin-bottom: 15px; font-size: 1rem; }
-        input:focus { border-color: var(--brand-primary); }
-        .pay-btn { background: var(--brand-primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; width: 100%; box-shadow: 0 4px 12px rgba(255,103,0,0.2); }
-    </style>
-</head>
-<body>
-    <div class="checkout-box">
-        <h2>🔒 Secure M-Pesa Checkout</h2>
-        <div class="item-details">
-            <h3 style="margin: 0 0 5px 0;">{{ phone.name }}</h3>
-            <p style="margin: 0; font-size: 0.9rem; color: #475569;">{{ phone.description }}</p>
-            <div class="price-display">KSh {{ "{:,}".format(phone.price) }}</div>
-        </div>
+<html>
+<body style="font-family:sans-serif; background:#f9fafb; padding:40px; text-align:center; color:#333;">
+    <div style="max-width:400px; margin:0 auto; background:white; padding:30px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.05); border:1px solid #eee;">
+        <h2 style="color:#FF6700;">🔒 Secure M-Pesa Checkout</h2>
+        <h3>{{ phone.name }}</h3>
+        <p style="font-size:1.3rem; font-weight:bold; color:#FF6700;">KSh {{ "{:,}".format(phone.price) }}</p>
         <form method="POST">
-            <input type="text" name="phone_number" placeholder="Enter Safaricom Number (e.g., 07...)" required>
-            <button type="submit" class="pay-btn">Request M-Pesa STK Push</button>
+            <input type="text" name="phone_number" placeholder="Enter M-Pesa Number (e.g. 07...)" required style="width:100%; padding:12px; margin-bottom:15px; box-sizing:border-box; border:1px solid #ccc; border-radius:6px;"><br>
+            <button type="submit" style="background:#FF6700; color:white; border:none; padding:12px; width:100%; border-radius:8px; font-weight:700; cursor:pointer;">Pay via M-Pesa</button>
         </form>
-        <a href="/" style="display: block; margin-top: 15px; color: #475569; text-decoration: none; font-size: 0.9rem; font-weight: 600;">← Cancel and Go Back</a>
+        <a href="/" style="display:block; margin-top:15px; color:#666; text-decoration:none; font-size:0.9rem;">← Go Back</a>
     </div>
 </body>
 </html>

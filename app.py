@@ -10,8 +10,8 @@ app = Flask(__name__, template_folder=template_dir)
 app.secret_key = 'kenya_phone_store_secret_key'
 
 def get_db_connection():
-    # Bumping to version 100 completely drops any old corrupted database files on Render
-    db_path = os.path.join(base_dir, 'store_v100.db')
+    # Utilizing your original database filename structure clears existing runtime cache conflicts
+    db_path = os.path.join(base_dir, 'store.db')
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
@@ -144,7 +144,7 @@ def pay():
         cursor.execute('''
             INSERT INTO orders (username, item_name, amount, phone_number, status, timestamp)
             VALUES (?, ?, ?, ?, ?, ?)
-        ''', (session['user'], phone['name'], phone['price'], phone_number, 'Pending API M-Pesa Verification', timestamp))
+        ''', (session['user'], phone['name'], phone['price'], phone_number, 'Pending Verification', timestamp))
         conn.commit()
         conn.close()
         return redirect(url_for('orders'))

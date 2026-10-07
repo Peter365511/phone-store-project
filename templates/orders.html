@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html>
-<body style="font-family:sans-serif; background:#f9fafb; padding:40px;">
-    <div style="max-width:600px; margin:0 auto; background:white; padding:30px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.05);">
-        <h2>📋 My Purchase History</h2>
+<body style="font-family:sans-serif; background:#f9fafb; padding:40px; color:#333;">
+    <div style="max-width:600px; margin:0 auto; background:white; padding:30px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.05); border:1px solid #eee;">
+        <h2 style="border-bottom:2px solid #f1f5f9; padding-bottom:10px;">📋 My Purchase History</h2>
         {% if orders %}
             {% for order in orders %}
-            <div style="background:#f4f6f9; padding:15px; margin-bottom:10px; border-radius:8px;">
-                <h3>Item: {{ order.item_name }}</h3>
-                <p>Paid: KSh {{ "{:,}".format(order.amount) }}</p>
-                <p>Status: <strong style="color:#27ae60;">{{ order.status }}</strong></p>
+            <div style="background:#f4f6f9; padding:15px; margin-bottom:10px; border-radius:8px; position:relative; border:1px solid #e2e8f0;">
+                <h3 style="margin:0 0 5px 0;">Item: {{ order.item_name }}</h3>
+                <p style="margin:0; font-weight:bold; color:#FF6700;">Paid: KSh {{ "{:,}".format(order.amount) }}</p>
+                <span style="position:absolute; top:15px; right:15px; background:#e6f7ed; color:#15803d; padding:4px 10px; border-radius:20px; font-size:0.8rem; font-weight:700;">{{ order.status }}</span>
             </div>
             {% endfor %}
         {% else %}
-            <p style="color:#666;">No paid orders found.</p>
+            <p style="color:#666; text-align:center; padding:20px;">No paid products logs found.</p>
         {% endif %}
-        <a href="/" style="display:inline-block; margin-top:15px; color:#FF6700; font-weight:bold; text-decoration:none;">← Return to Shop</a>
+        <a href="/" style="display:inline-block; margin-top:15px; background:#FF6700; color:white; padding:10px 20px; text-decoration:none; border-radius:8px; font-weight:bold;">← Return to Shop</a>
     </div>
 </body>
 </html>
