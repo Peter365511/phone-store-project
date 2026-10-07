@@ -1,15 +1,90 @@
 <!DOCTYPE html>
-<html>
-<body style="font-family:sans-serif; background:#f9fafb; padding:40px; text-align:center; color:#333;">
-    <div style="max-width:400px; margin:0 auto; background:white; padding:30px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.05); border:1px solid #eee;">
-        <h2 style="color:#FF6700;">🔒 Secure M-Pesa Checkout</h2>
-        <h3>{{ phone.name }}</h3>
-        <p style="font-size:1.3rem; font-weight:bold; color:#FF6700;">KSh {{ "{:,}".format(phone.price) }}</p>
-        <form method="POST">
-            <input type="text" name="phone_number" placeholder="Enter M-Pesa Number (e.g. 07...)" required style="width:100%; padding:12px; margin-bottom:15px; box-sizing:border-box; border:1px solid #ccc; border-radius:6px;"><br>
-            <button type="submit" style="background:#FF6700; color:white; border:none; padding:12px; width:100%; border-radius:8px; font-weight:700; cursor:pointer;">Pay via M-Pesa</button>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔒 M-Pesa Secure Checkout - Phone Store Kenya</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f9fafb; padding: 40px; text-align: center; color: #333; margin: 0; }
+        .box { max-width: 400px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; }
+        .pay-btn { background: #FF6700; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 1rem; }
+        
+        /* 📱 STK PUSH POPUP MODAL STYLING (Authentic SIM Toolkit look) */
+        .stk-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; }
+        .stk-modal { background: #3a3a3a; width: 310px; border-radius: 14px; color: white; text-align: left; box-shadow: 0 10px 30px rgba(0,0,0,0.3); overflow: hidden; font-family: monospace, sans-serif; border: 1px solid #555; }
+        .stk-header { background: #222; padding: 12px 15px; font-weight: bold; font-size: 0.9rem; letter-spacing: 0.5px; color: #4caf50; display: flex; justify-content: space-between; }
+        .stk-body { padding: 20px 15px; font-size: 0.95rem; line-height: 1.5; color: #e0e0e0; }
+        .stk-input-box { background: white; color: black; border: none; font-size: 1.3rem; letter-spacing: 4px; text-align: center; font-weight: bold; padding: 8px; width: 80%; margin: 15px auto 5px auto; display: block; border-radius: 4px; outline: none; }
+        .stk-footer { display: flex; border-top: 1px solid #555; background: #2b2b2b; }
+        .stk-btn { flex: 1; background: none; border: none; color: #007aff; font-size: 1rem; font-weight: bold; padding: 12px; cursor: pointer; text-align: center; }
+        .stk-btn:first-child { border-right: 1px solid #555; color: #ff3b30; }
+        .stk-btn:hover { background: rgba(255,255,255,0.05); }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h2 style="color:#FF6700; margin-top:0;">🔒 Secure M-Pesa Checkout</h2>
+        <h3 style="margin-bottom:5px;">{{ phone.name }}</h3>
+        <p style="font-size:1.3rem; font-weight:bold; color:#FF6700; margin-top:5px;">KSh {{ "{:,}".format(phone.price) }}</p>
+        
+        <!-- Intercepted Form submission to trigger visual prompt modal -->
+        <form id="checkoutForm" method="POST">
+            <input type="text" id="phone_num" name="phone_number" placeholder="Enter M-Pesa Number (e.g. 07...)" required><br>
+            <button type="button" class="pay-btn" onclick="triggerSTKPushSimulation()">Pay via M-Pesa</button>
         </form>
         <a href="/" style="display:block; margin-top:15px; color:#666; text-decoration:none; font-size:0.9rem;">← Go Back</a>
     </div>
+
+    <!-- 📡 INTERACTIVE SIM TOOLKIT DIALOG OVERLAY SCREEN -->
+    <div class="stk-overlay" id="mpesaOverlay">
+        <div class="stk-modal">
+            <div class="stk-header">
+                <span>Safaricom M-Pesa</span>
+                <span style="color:#aaa; font-size:0.75rem;">Secure SIM</span>
+            </div>
+            <div class="stk-body">
+                Lipa Na M-PESA Online.<br>
+                Do you want to pay KSh <strong style="color:white;">{{ "{:,}".format(phone.price) }}</strong> to PHONE STORE KENYA?<br><br>
+                Enter 4-Digit M-Pesa PIN:
+                <input type="password" id="mpesaPin" class="stk-input-box" maxlength="4" placeholder="••••" autocomplete="off">
+            </div>
+            <div class="stk-footer">
+                <button type="button" class="stk-btn" onclick="cancelSTKPush()">Cancel</button>
+                <button type="button" class="stk-btn" style="color: #4caf50;" onclick="submitSTKPush()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function triggerSTKPushSimulation() {
+            let phoneNum = document.getElementById("phone_num").value.trim();
+            if (phoneNum === "") {
+                alert("Please input a valid Safaricom phone number first!");
+                return;
+            }
+            // Display prompt window overlay seamlessly
+            document.getElementById("mpesaOverlay").style.display = "flex";
+            document.getElementById("mpesaPin").focus();
+        }
+
+        function cancelSTKPush() {
+            document.getElementById("mpesaOverlay").style.display = "none";
+            document.getElementById("mpesaPin").value = "";
+            alert("M-Pesa STK Push sequence declined by user.");
+        }
+
+        function submitSTKPush() {
+            let pin = document.getElementById("mpesaPin").value;
+            if (pin.length < 4) {
+                alert("Please enter your complete 4-Digit transactional PIN!");
+                return;
+            }
+            document.getElementById("mpesaOverlay").style.display = "none";
+            // Proceed to submit form payload data securely over the backend route channel
+            document.getElementById("checkoutForm").submit();
+        }
+    </script>
 </body>
 </html>

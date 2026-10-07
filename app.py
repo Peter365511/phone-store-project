@@ -186,8 +186,10 @@ def admin_panel():
         
     all_phones = conn.execute('SELECT * FROM phones ORDER BY id DESC').fetchall()
     all_orders = conn.execute('SELECT * FROM orders ORDER BY id DESC').fetchall()
+    
+    # 📈 LIVE REVENUE METRIC SUMMATION ENGINE
+    total_revenue = 0
+    for order in all_orders:
+        total_revenue += int(order['amount'])
+        
     conn.close()
-    return render_template('admin.html', phones=all_phones, orders=all_orders)
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=True)
